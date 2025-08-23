@@ -5,307 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A free 3D tool to visually check if strollers, luggage, and other items will fit in your car's boot. Supports presets for popular cars and items, or create your own.">
     <title>Does My Boot Fit</title>
+    
     <!-- AdSense Snippet -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9583160305658839"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9583160305658839" crossorigin="anonymous"></script>
+    
     <!-- Three.js Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #0b0c0f;
-            color: #f4f4f5;
-            overflow: hidden;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            height: 100vh;
-            gap: 1rem;
-            padding: 1rem;
-        }
-
-        .sidebar {
-            background: #14161c;
-            border: 1px solid #3f3f46;
-            border-radius: 1rem;
-            padding: 1rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .canvas-container {
-            background: #0d0f14;
-            border: 1px solid #3f3f46;
-            border-radius: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .section {
-            background: #1f2937;
-            border: 1px solid #374151;
-            border-radius: 0.75rem;
-            padding: 1rem;
-        }
-
-        .section h2, .section h3 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-        
-        select {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid #374151;
-            background: #111827;
-            color: #f9fafb;
-            font-size: 0.75rem;
-        }
-
-        .fit-status {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .badges {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            border: 1px solid #374151;
-            background: rgba(0, 0, 0, 0.7);
-            font-size: 0.75rem;
-        }
-
-        .badge.green { color: #4ade80; }
-        .badge.yellow { color: #fbbf24; }
-        .badge.red { color: #f87171; }
-
-        .button-group {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            border: 1px solid #374151;
-            background: #111827;
-            color: #f9fafb;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            flex-grow: 1;
-        }
-        
-        .btn.danger {
-            background: #ef4444;
-            color: #fef2f2;
-            border-color: #ef4444;
-        }
-
-        .btn:hover {
-            background: #1f2937;
-        }
-        
-        .btn.danger:hover {
-            background: #dc2626;
-        }
-
-        .btn.primary {
-            background: #60a5fa;
-            color: #1e3a8a;
-            border-color: #60a5fa;
-        }
-
-        .btn.primary:hover {
-            background: #3b82f6;
-        }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.5rem;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .input-group label {
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .input-group input {
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid #374151;
-            background: #111827;
-            color: #f9fafb;
-            font-size: 0.75rem;
-        }
-        
-        .input-group input:read-only {
-            background: #374151;
-            cursor: not-allowed;
-        }
-
-        .slider-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            margin-top: 0.5rem;
-        }
-
-        .slider-group label {
-            font-size: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .slider-group label input[type="number"] {
-            width: 60px;
-            padding: 0.25rem;
-            text-align: right;
-            background: #1f2937;
-            border: 1px solid #374151;
-            color: #f9fafb;
-        }
-
-        .slider-group input[type="range"] {
-            width: 100%;
-        }
-        
-        .checkbox-group, .toggle-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            font-size: 0.75rem;
-        }
-        
-        /* Toggle Switch Styles */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 34px;
-            height: 20px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #374151;
-            transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #60a5fa;
-        }
-        input:checked + .slider:before {
-            transform: translateX(14px);
-        }
-        input:disabled + .slider {
-            cursor: not-allowed;
-            background-color: #4b5563;
-        }
-
-        .description {
-            font-size: 0.75rem;
-            color: #9ca3af;
-            margin-top: 0.5rem;
-        }
-
-        #canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-        
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-        }
-        .modal-content {
-            background-color: #14161c;
-            margin: 15% auto;
-            padding: 1.5rem;
-            border: 1px solid #3f3f46;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 1rem;
-        }
-        .modal-content h3 {
-            margin-bottom: 1rem;
-        }
-        .modal-content .input-group {
-            margin-bottom: 1rem;
-        }
-        .modal-content .input-group input {
-            width: 100%;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
-            }
-
-            .sidebar {
-                max-height: 50vh;
-            }
-        }
-    </style>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
     <div class="container">
@@ -323,25 +33,90 @@
             <section class="section">
                 <h3>Manage Objects</h3>
                 <div id="add-item-buttons" class="button-group">
-                     <button class="btn primary" onclick="addItem('VISTA_V2')">+ VISTA V2</button>
-                     <button class="btn primary" onclick="addItem('AWAY_CARRY_ON')">+ Away Carry-On</button>
+                    <!-- Populated by JavaScript -->
                 </div>
                 <div class="button-group" style="margin-top: 0.5rem;">
-                    <button class="btn" onclick="showItemModal()">+ Add Custom Item</button>
-                </div>
-                 <div class="button-group" style="margin-top: 0.5rem;">
-                    <select id="objectSelector" onchange="setActiveObject(this.value)"></select>
-                    <button class="btn danger" onclick="removeActiveItem()">Remove Selected</button>
+                    <button class="btn" onclick="window.app.showItemModal()">+ Add Custom Item</button>
                 </div>
                 <div class="button-group" style="margin-top: 0.5rem;">
-                     <button id="editItemBtn" class="btn" onclick="editActiveItemPreset()" style="display: none;">Edit Preset</button>
-                    <button id="deleteItemBtn" class="btn danger" onclick="deleteActiveItemPreset()" style="display: none;">Delete Preset</button>
+                    <select id="objectSelector" onchange="window.app.setActiveObject(this.value)"></select>
+                    <button class="btn danger" onclick="window.app.removeActiveItem()">Remove Selected</button>
                 </div>
                 <div class="button-group" style="margin-top: 0.5rem;">
-                    <button class="btn" onclick="resetState()">Reset & Clear</button>
+                    <button id="editItemBtn" class="btn" onclick="window.app.editActiveItemPreset()" style="display: none;">Edit Preset</button>
+                    <button id="deleteItemBtn" class="btn danger" onclick="window.app.deleteActiveItemPreset()" style="display: none;">Delete Preset</button>
+                </div>
+                <div class="button-group" style="margin-top: 0.5rem;">
+                    <button class="btn" onclick="window.app.resetState()">Reset & Clear</button>
                 </div>
             </section>
-            
+            <section class="section">
+                <h3>Car Model</h3>
+                <div class="button-group">
+                    <select id="carSelector" onchange="window.app.selectCar(this.value)"></select>
+                    <button id="editCarBtn" class="btn" onclick="window.app.editActiveCar()" style="display: none;">Edit</button>
+                    <button id="deleteCarBtn" class="btn danger" onclick="window.app.deleteActiveCar()" style="display: none;">Delete</button>
+                </div>
+                <div class="button-group" style="margin-top: 0.5rem;">
+                    <button class="btn" onclick="window.app.showCarModal()">+ Add Custom Car</button>
+                </div>
+                <div class="input-grid" style="margin-top: 0.5rem;">
+                    <div class="input-group"><label>Width</label><input type="number" id="bootWidth" step="0.1" onchange="window.app.updateBootManual()"></div>
+                    <div class="input-group"><label>Depth</label><input type="number" id="bootDepth" step="0.1" onchange="window.app.updateBootManual()"></div>
+                    <div class="input-group"><label>Height</label><input type="number" id="bootHeight" step="0.1" readonly></div>
+                </div>
+                <div class="toggle-group" style="justify-content: space-between;">
+                    <label for="shelfToggle">Parcel Shelf In</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="shelfToggle" onchange="window.app.toggleShelf()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="section" id="controlsSection" style="display: none;">
+                <h3 id="activeItemName"></h3>
+                <div class="input-grid">
+                    <div class="input-group"><label>Length</label><input type="number" id="itemLength" step="0.1" onchange="window.app.updateActiveItemDimensions()"></div>
+                    <div class="input-group"><label>Width</label><input type="number" id="itemWidth" step="0.1" onchange="window.app.updateActiveItemDimensions()"></div>
+                    <div class="input-group"><label>Thickness</label><input type="number" id="itemThickness" step="0.1" onchange="window.app.updateActiveItemDimensions()"></div>
+                </div>
+                 
+                <h3 style="margin-top: 1rem;">Position (cm)</h3>
+                <div class="slider-group">
+                    <label>X: <span id="posXValue">0.0</span></label>
+                    <input type="range" id="posXSlider" min="0" max="100" value="50" step="0.1" oninput="window.app.updateFromUI()">
+                </div>
+                <div class="slider-group">
+                    <label>Y: <span id="posYValue">0.0</span></label>
+                    <input type="range" id="posYSlider" min="0" max="100" value="22" step="0.1" oninput="window.app.updateFromUI()">
+                </div>
+                <div class="slider-group">
+                    <label>Z: <span id="posZValue">0.0</span></label>
+                    <input type="range" id="posZSlider" min="0" max="93" value="46.5" step="0.1" oninput="window.app.updateFromUI()">
+                </div>
+
+                <h3 style="margin-top: 1rem;">Rotation</h3>
+                <div class="slider-group">
+                    <label><span>Yaw</span> <span><input type="number" id="yawInput" value="0" step="1" onchange="window.app.updateFromUI(true)">°</span></label>
+                    <input type="range" id="yawSlider" min="0" max="359" value="0" oninput="window.app.updateFromUI()">
+                </div>
+                <div class="slider-group">
+                    <label><span>Pitch</span> <span><input type="number" id="pitchInput" value="0" min="-90" max="90" step="1" onchange="window.app.updateFromUI(true)">°</span></label>
+                    <input type="range" id="pitchSlider" min="-90" max="90" value="0" oninput="window.app.updateFromUI()">
+                </div>
+                <div class="slider-group">
+                    <label><span>Roll</span> <span><input type="number" id="rollInput" value="0" min="-90" max="90" step="1" onchange="window.app.updateFromUI(true)">°</span></label>
+                    <input type="range" id="rollSlider" min="-90" max="90" value="0" oninput="window.app.updateFromUI()">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="snapRotation" onchange="window.app.updateFromUI()">
+                    <label for="snapRotation">Snap to 90°</label>
+                </div>
+                <div class="button-group" style="margin-top: 0.5rem;">
+                    <button class="btn" onclick="window.app.centerActiveObject()">Center</button>
+                </div>
+            </section>
             <section class="section">
                 <!-- Ad Unit -->
                 <ins class="adsbygoogle"
@@ -354,75 +129,6 @@
                         (adsbygoogle = window.adsbygoogle || []).push({});
                      });
                 </script>
-            </section>
-
-
-            <section class="section">
-                <h3>Car Model</h3>
-                <div class="button-group">
-                    <select id="carSelector" onchange="selectCar(this.value)"></select>
-                    <button id="editCarBtn" class="btn" onclick="editActiveCar()" style="display: none;">Edit</button>
-                    <button id="deleteCarBtn" class="btn danger" onclick="deleteActiveCar()" style="display: none;">Delete</button>
-                </div>
-                 <div class="button-group" style="margin-top: 0.5rem;">
-                    <button class="btn" onclick="showCarModal()">+ Add Custom Car</button>
-                </div>
-                <div class="input-grid" style="margin-top: 0.5rem;">
-                    <div class="input-group"><label>Width</label><input type="number" id="bootWidth" step="0.1" onchange="updateBootManual()"></div>
-                    <div class="input-group"><label>Depth</label><input type="number" id="bootDepth" step="0.1" onchange="updateBootManual()"></div>
-                    <div class="input-group"><label>Height</label><input type="number" id="bootHeight" step="0.1" readonly></div>
-                </div>
-                 <div class="toggle-group" style="justify-content: space-between;">
-                    <label for="shelfToggle">Parcel Shelf In</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="shelfToggle" onchange="toggleShelf()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </section>
-
-            <section class="section" id="controlsSection" style="display: none;">
-                <h3 id="activeItemName"></h3>
-                <div class="input-grid">
-                    <div class="input-group"><label>Length</label><input type="number" id="itemLength" step="0.1" onchange="updateActiveItemDimensions()"></div>
-                    <div class="input-group"><label>Width</label><input type="number" id="itemWidth" step="0.1" onchange="updateActiveItemDimensions()"></div>
-                    <div class="input-group"><label>Thickness</label><input type="number" id="itemThickness" step="0.1" onchange="updateActiveItemDimensions()"></div>
-                </div>
-                 
-                 <h3 style="margin-top: 1rem;">Position (cm)</h3>
-                 <div class="slider-group">
-                    <label>X: <span id="posXValue">0.0</span></label>
-                    <input type="range" id="posXSlider" min="0" max="100" value="50" step="0.1" oninput="updateFromUI()">
-                </div>
-                 <div class="slider-group">
-                    <label>Y: <span id="posYValue">0.0</span></label>
-                    <input type="range" id="posYSlider" min="0" max="100" value="22" step="0.1" oninput="updateFromUI()">
-                </div>
-                 <div class="slider-group">
-                    <label>Z: <span id="posZValue">0.0</span></label>
-                    <input type="range" id="posZSlider" min="0" max="93" value="46.5" step="0.1" oninput="updateFromUI()">
-                </div>
-
-                <h3 style="margin-top: 1rem;">Rotation</h3>
-                <div class="slider-group">
-                    <label><span>Yaw</span> <span><input type="number" id="yawInput" value="0" step="1" onchange="updateFromUI(true)">°</span></label>
-                    <input type="range" id="yawSlider" min="0" max="359" value="0" oninput="updateFromUI()">
-                </div>
-                <div class="slider-group">
-                    <label><span>Pitch</span> <span><input type="number" id="pitchInput" value="0" min="-90" max="90" step="1" onchange="updateFromUI(true)">°</span></label>
-                    <input type="range" id="pitchSlider" min="-90" max="90" value="0" oninput="updateFromUI()">
-                </div>
-                <div class="slider-group">
-                    <label><span>Roll</span> <span><input type="number" id="rollInput" value="0" min="-90" max="90" step="1" onchange="updateFromUI(true)">°</span></label>
-                    <input type="range" id="rollSlider" min="-90" max="90" value="0" oninput="updateFromUI()">
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="snapRotation" onchange="updateFromUI()">
-                    <label for="snapRotation">Snap to 90°</label>
-                </div>
-                 <div class="button-group" style="margin-top: 0.5rem;">
-                    <button class="btn" onclick="centerActiveObject()">Center</button>
-                </div>
             </section>
         </aside>
 
@@ -447,7 +153,7 @@
                     <div class="input-group"><label>Thickness</label><input type="number" id="modalItemT" step="0.1" required></div>
                 </div>
                 <div class="button-group" style="margin-top: 1rem;">
-                    <button type="button" class="btn" onclick="hideItemModal()">Cancel</button>
+                    <button type="button" class="btn" onclick="window.app.hideItemModal()">Cancel</button>
                     <button type="submit" class="btn primary">Save</button>
                 </div>
             </form>
@@ -471,7 +177,7 @@
                 <div class="toggle-group" style="justify-content: space-between; margin-bottom: 1rem;">
                     <label for="modalCarHasShelf">Removable Parcel Shelf</label>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="modalCarHasShelf" onchange="toggleShelfHeightInput()">
+                        <input type="checkbox" id="modalCarHasShelf" onchange="window.app.toggleShelfHeightInput()">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -481,722 +187,17 @@
                 </div>
                 <div class="input-group" id="shelfOutGroup" style="display: none;">
                     <label for="modalCarHShelfOut">Height (Shelf Out)</label>
-                    <input type="number" id="modalCarHShelfOut" step="0.1" required>
+                    <input type="number" id="modalCarHShelfOut" step="0.1">
                 </div>
                 <div class="button-group" style="margin-top: 1rem;">
-                    <button type="button" class="btn" onclick="hideCarModal()">Cancel</button>
+                    <button type="button" class="btn" onclick="window.app.hideCarModal()">Cancel</button>
                     <button type="submit" class="btn primary">Save</button>
                 </div>
             </form>
         </div>
     </div>
     
-    <script>
-        // --- GLOBAL STATE ---
-        let scene, camera, renderer, controls;
-        let bootMesh, gridHelper, labelsGroup;
-        let isDragging = false;
-        let dragOffset = new THREE.Vector3();
-        let raycaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
-        let plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-        
-        // --- APP STATE ---
-        let appState = {
-            carKey: 'ENYAQ',
-            shelfIn: true,
-            sceneObjects: [],
-            activeObjectId: null,
-            userCars: {},
-            userItems: {}
-        };
-
-        // --- PRESET CONFIGS ---
-        const PRESET_ITEMS = {
-            'VISTA_V2': { name: 'VISTA V2', L: 84.5, W: 65.3, T: 44 },
-            'AWAY_CARRY_ON': { name: 'Away Carry-On', L: 55.1, W: 34.8, T: 22.9 }
-        };
-        const PRESET_CARS = {
-            'ENYAQ': { name: 'Skoda Enyaq', W: 100, D: 93, H_shelf_in: 49, H_shelf_out: 73 },
-            'MODEL_3': { name: 'Tesla Model 3', W: 97, D: 109, H_shelf_in: 43, H_shelf_out: 43 },
-            'I4': { name: 'BMW i4', W: 100, D: 105, H_shelf_in: 45, H_shelf_out: 75 }
-        };
-
-        // --- UTILITY FUNCTIONS ---
-        function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
-        function toRad(degrees) { return (degrees * Math.PI) / 180; }
-
-        function createTextSprite(message, parameters) {
-            const fontface = parameters.fontface || 'Arial';
-            const fontsize = parameters.fontsize || 18;
-            const textColor = parameters.textColor || { r: 255, g: 255, b: 255, a: 1.0 };
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            context.font = `Bold ${fontsize}px ${fontface}`;
-            const metrics = context.measureText(message);
-            canvas.width = metrics.width;
-            canvas.height = fontsize * 1.4;
-            context.font = `Bold ${fontsize}px ${fontface}`;
-            context.fillStyle = `rgba(${textColor.r}, ${textColor.g}, ${textColor.b}, ${textColor.a})`;
-            context.fillText(message, 0, fontsize);
-            const texture = new THREE.Texture(canvas);
-            texture.needsUpdate = true;
-            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(spriteMaterial);
-            sprite.scale.set(canvas.width / 5, canvas.height / 5, 1.0);
-            return sprite;
-        }
-        
-        function getCarByKey(key) {
-            if (PRESET_CARS[key]) return PRESET_CARS[key];
-            return appState.userCars[key];
-        }
-
-        function getItemByKey(key) {
-            if (PRESET_ITEMS[key]) return PRESET_ITEMS[key];
-            return appState.userItems[key];
-        }
-
-        // --- CORE LOGIC ---
-        function getObjectWorldBounds(obj) {
-            if (!obj || !obj.mesh) return null;
-            obj.mesh.geometry.computeBoundingBox();
-            return new THREE.Box3().copy(obj.mesh.geometry.boundingBox).applyMatrix4(obj.mesh.matrixWorld);
-        }
-
-        function checkAllCollisionsAndFit() {
-            appState.sceneObjects.forEach(obj => obj.isColliding = false);
-
-            for (let i = 0; i < appState.sceneObjects.length; i++) {
-                for (let j = i + 1; j < appState.sceneObjects.length; j++) {
-                    const obj1 = appState.sceneObjects[i];
-                    const obj2 = appState.sceneObjects[j];
-                    const bounds1 = getObjectWorldBounds(obj1);
-                    const bounds2 = getObjectWorldBounds(obj2);
-                    if (bounds1 && bounds2 && bounds1.intersectsBox(bounds2)) {
-                        obj1.isColliding = true;
-                        obj2.isColliding = true;
-                    }
-                }
-            }
-
-            const car = getCarByKey(appState.carKey);
-            const bootHeight = appState.shelfIn ? car.H_shelf_in : car.H_shelf_out;
-
-            appState.sceneObjects.forEach(obj => {
-                const bounds = getObjectWorldBounds(obj);
-                if (!bounds) return;
-                const tolerance = 0.001; 
-                const fitsX = bounds.min.x >= -tolerance && bounds.max.x <= car.W + tolerance;
-                const fitsY = bounds.min.y >= -tolerance && bounds.max.y <= bootHeight + tolerance;
-                const fitsZ = bounds.min.z >= -tolerance && bounds.max.z <= car.D + tolerance;
-
-                let reason = 'Fits', color = 0x21c07a;
-                if (obj.isColliding) { reason = 'Colliding'; color = 0xff6b6b; }
-                else if (!fitsX || !fitsZ) { reason = 'Exceeds Bounds'; color = 0xff6b6b; }
-                else if (!fitsY) { reason = 'Too Tall'; color = 0xf1c40f; }
-                
-                obj.fitStatus = reason;
-                obj.mesh.material.color.setHex(color);
-            });
-            
-            updateFitStatusBadge();
-            saveState();
-        }
-
-        // --- THREE.JS SETUP ---
-        function init() {
-            const canvas = document.getElementById('canvas');
-            const container = canvas.parentElement;
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0d0f14);
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
-            camera.position.set(150, 150, 180);
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(200, 300, 200);
-            scene.add(directionalLight);
-            
-            loadState();
-            populateCarSelector();
-            populateAddItemButtons();
-            
-            document.getElementById('itemForm').addEventListener('submit', handleItemForm);
-            document.getElementById('carForm').addEventListener('submit', handleCarForm);
-
-            window.addEventListener('resize', onWindowResize);
-            setupDragHandlers();
-            animate();
-        }
-
-        function createBoot() {
-            const car = getCarByKey(appState.carKey);
-            const bootHeight = appState.shelfIn ? car.H_shelf_in : car.H_shelf_out;
-            
-            if (bootMesh) scene.remove(bootMesh);
-            if (gridHelper) scene.remove(gridHelper);
-            if (labelsGroup) scene.remove(labelsGroup);
-            
-            const group = new THREE.Group();
-            const bootGeometry = new THREE.BoxGeometry(car.W, bootHeight, car.D);
-            const edges = new THREE.EdgesGeometry(bootGeometry);
-            const lineMaterial = new THREE.LineBasicMaterial({ color: 0x3f3f46 });
-            const bootWireframe = new THREE.LineSegments(edges, lineMaterial);
-            bootWireframe.position.set(car.W / 2, bootHeight / 2, car.D / 2);
-            group.add(bootWireframe);
-            
-            const floorGeometry = new THREE.PlaneGeometry(car.W, car.D);
-            const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x0d0f14, roughness: 0.8 });
-            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-            floor.rotation.x = -Math.PI / 2;
-            floor.position.set(car.W / 2, 0.01, car.D / 2);
-            group.add(floor);
-            
-            labelsGroup = new THREE.Group();
-            const labelParams = { fontsize: 24, textColor: { r: 150, g: 150, b: 150, a: 1.0 } };
-            const frontLabel = createTextSprite("Front", labelParams);
-            frontLabel.position.set(car.W / 2, bootHeight + 10, car.D);
-            labelsGroup.add(frontLabel);
-            const backLabel = createTextSprite("Back", labelParams);
-            backLabel.position.set(car.W / 2, bootHeight + 10, 0);
-            labelsGroup.add(backLabel);
-            const leftLabel = createTextSprite("Left", labelParams);
-            leftLabel.position.set(0, bootHeight + 10, car.D / 2);
-            labelsGroup.add(leftLabel);
-            const rightLabel = createTextSprite("Right", labelParams);
-            rightLabel.position.set(car.W, bootHeight + 10, car.D / 2);
-            labelsGroup.add(rightLabel);
-            scene.add(labelsGroup);
-            
-            gridHelper = new THREE.GridHelper(Math.max(car.W, car.D) * 1.2, 20, 0x2b3040, 0x1f2330);
-            gridHelper.position.set(car.W / 2, 0, car.D / 2);
-            scene.add(gridHelper);
-            
-            bootMesh = group;
-            scene.add(bootMesh);
-            controls.target.set(car.W / 2, 0, car.D / 2);
-        }
-
-        // --- EVENT HANDLING ---
-        function setupDragHandlers() {
-            const canvas = renderer.domElement;
-            canvas.addEventListener('pointerdown', onPointerDown);
-            window.addEventListener('pointermove', onPointerMove);
-            window.addEventListener('pointerup', onPointerUp);
-        }
-
-        function onPointerDown(event) {
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            if (!activeObj) return;
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(activeObj.mesh);
-            if (intersects.length > 0) {
-                isDragging = true;
-                controls.enabled = false;
-                const groundPoint = new THREE.Vector3();
-                if (raycaster.ray.intersectPlane(plane, groundPoint)) {
-                    dragOffset.subVectors(activeObj.mesh.position, groundPoint);
-                }
-            }
-        }
-
-        function onPointerMove(event) {
-            if (!isDragging) return;
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            if (!activeObj) return;
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const groundPoint = new THREE.Vector3();
-            if (raycaster.ray.intersectPlane(plane, groundPoint)) {
-                activeObj.position.x = groundPoint.x + dragOffset.x;
-                activeObj.position.z = groundPoint.z + dragOffset.z;
-                applyStateToObject(activeObj, true);
-            }
-        }
-
-        function onPointerUp() {
-            if (isDragging) { isDragging = false; controls.enabled = true; }
-        }
-
-        function onWindowResize() {
-            const container = document.querySelector('.canvas-container');
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
-        // --- OBJECT MANAGEMENT ---
-        function addItem(itemKey) {
-            const id = Date.now();
-            const config = getItemByKey(itemKey);
-            const car = getCarByKey(appState.carKey);
-            const newObject = {
-                id: id,
-                itemKey: itemKey,
-                name: `${config.name} #${appState.sceneObjects.length + 1}`,
-                position: { x: car.W / 2, y: 0, z: car.D / 2 },
-                rotation: { yaw: 0, pitch: 0, roll: 0 },
-                isColliding: false,
-                fitStatus: 'Checking...'
-            };
-            appState.sceneObjects.push(newObject);
-            recreateMeshes();
-            setActiveObject(id);
-            centerActiveObject();
-        }
-
-        function removeActiveItem() {
-            if (!appState.activeObjectId) return;
-            const index = appState.sceneObjects.findIndex(o => o.id === appState.activeObjectId);
-            if (index > -1) {
-                scene.remove(appState.sceneObjects[index].mesh);
-                appState.sceneObjects[index].mesh.geometry.dispose();
-                appState.sceneObjects[index].mesh.material.dispose();
-                appState.sceneObjects.splice(index, 1);
-                const newActiveId = appState.sceneObjects.length > 0 ? appState.sceneObjects[0].id : null;
-                setActiveObject(newActiveId);
-            }
-            checkAllCollisionsAndFit();
-        }
-
-        function setActiveObject(id) {
-            appState.activeObjectId = id ? parseInt(id) : null;
-            updateObjectSelector();
-            updateUIFromState();
-            checkAllCollisionsAndFit();
-        }
-        
-        function recreateMeshes() {
-            appState.sceneObjects.forEach(obj => {
-                if (obj.mesh) scene.remove(obj.mesh);
-            });
-            appState.sceneObjects.forEach(obj => {
-                const config = getItemByKey(obj.itemKey);
-                const geometry = new THREE.BoxGeometry(config.L, config.T, config.W);
-                const material = new THREE.MeshStandardMaterial({ color: 0x21c07a, metalness: 0.2, roughness: 0.4, transparent: true, opacity: 0.9 });
-                obj.mesh = new THREE.Mesh(geometry, material);
-                scene.add(obj.mesh);
-                applyStateToObject(obj);
-            });
-        }
-
-        // --- UI & STATE LOGIC ---
-        function updateFitStatusBadge() {
-             const badge = document.getElementById('fitStatusBadge');
-             const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-             if (!activeObj) {
-                 badge.textContent = 'No item';
-                 badge.className = 'badge';
-                 return;
-             }
-             badge.textContent = activeObj.fitStatus;
-             let colorClass = 'red';
-             if (activeObj.fitStatus === 'Fits') colorClass = 'green';
-             if (activeObj.fitStatus === 'Too Tall') colorClass = 'yellow';
-             badge.className = `badge ${colorClass}`;
-        }
-        
-        function updateBoot() {
-            const car = getCarByKey(appState.carKey);
-            const shelfToggle = document.getElementById('shelfToggle');
-            const hasRemovableShelf = car.H_shelf_in !== car.H_shelf_out;
-            
-            shelfToggle.disabled = !hasRemovableShelf;
-            if (!hasRemovableShelf) {
-                appState.shelfIn = true;
-            }
-             shelfToggle.checked = appState.shelfIn;
-            
-            const bootHeight = appState.shelfIn ? car.H_shelf_in : car.H_shelf_out;
-            document.getElementById('bootWidth').value = car.W;
-            document.getElementById('bootDepth').value = car.D;
-            document.getElementById('bootHeight').value = bootHeight;
-            
-            document.getElementById('posXSlider').max = car.W;
-            document.getElementById('posZSlider').max = car.D;
-            document.getElementById('posYSlider').max = Math.max(car.H_shelf_in, car.H_shelf_out);
-            
-            createBoot();
-            checkAllCollisionsAndFit();
-        }
-
-        function updateBootManual() {
-            const car = getCarByKey(appState.carKey);
-            car.W = parseFloat(document.getElementById('bootWidth').value);
-            car.D = parseFloat(document.getElementById('bootDepth').value);
-            updateBoot();
-        }
-
-        function updateActiveItemDimensions() {
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            if (!activeObj) return;
-            const item = getItemByKey(activeObj.itemKey);
-            item.L = parseFloat(document.getElementById('itemLength').value);
-            item.W = parseFloat(document.getElementById('itemWidth').value);
-            item.T = parseFloat(document.getElementById('itemThickness').value);
-            recreateMeshes();
-        }
-        
-        function updateFromUI(fromNumberInput = false) {
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            if (!activeObj) return;
-            const snap = document.getElementById('snapRotation').checked;
-            if (fromNumberInput) {
-                activeObj.rotation.yaw = parseInt(document.getElementById('yawInput').value) || 0;
-                activeObj.rotation.pitch = parseInt(document.getElementById('pitchInput').value) || 0;
-                activeObj.rotation.roll = parseInt(document.getElementById('rollInput').value) || 0;
-            } else {
-                activeObj.position.x = parseFloat(document.getElementById('posXSlider').value);
-                activeObj.position.y = parseFloat(document.getElementById('posYSlider').value);
-                activeObj.position.z = parseFloat(document.getElementById('posZSlider').value);
-                activeObj.rotation.yaw = parseInt(document.getElementById('yawSlider').value) || 0;
-                activeObj.rotation.pitch = parseInt(document.getElementById('pitchSlider').value) || 0;
-                activeObj.rotation.roll = parseInt(document.getElementById('rollSlider').value) || 0;
-            }
-            if (snap) {
-                activeObj.rotation.yaw = Math.round(activeObj.rotation.yaw / 90) * 90;
-                activeObj.rotation.pitch = Math.round(activeObj.rotation.pitch / 90) * 90;
-                activeObj.rotation.roll = Math.round(activeObj.rotation.roll / 90) * 90;
-            }
-            applyStateToObject(activeObj);
-        }
-
-        function applyStateToObject(obj, isDrag = false) {
-            if (!obj || !obj.mesh) return;
-
-            obj.mesh.rotation.set(toRad(obj.rotation.pitch), toRad(obj.rotation.yaw), toRad(obj.rotation.roll), 'YXZ');
-            obj.mesh.position.set(obj.position.x, obj.position.y, obj.position.z);
-            obj.mesh.updateMatrixWorld(true);
-
-            const bounds = getObjectWorldBounds(obj);
-            if (bounds) {
-                if (isDrag) {
-                    const car = getCarByKey(appState.carKey);
-                    if (bounds.min.x < 0) obj.position.x -= bounds.min.x;
-                    if (bounds.max.x > car.W) obj.position.x -= (bounds.max.x - car.W);
-                    if (bounds.min.z < 0) obj.position.z -= bounds.min.z;
-                    if (bounds.max.z > car.D) obj.position.z -= (bounds.max.z - car.D);
-                } else {
-                    obj.position.y -= bounds.min.y;
-                }
-            }
-            
-            obj.mesh.position.set(obj.position.x, obj.position.y, obj.position.z);
-            obj.mesh.updateMatrixWorld(true);
-            
-            if (obj.id === appState.activeObjectId) updateUIFromState();
-            checkAllCollisionsAndFit();
-        }
-
-        function updateUIFromState() {
-            const controlsSection = document.getElementById('controlsSection');
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            const editItemBtn = document.getElementById('editItemBtn');
-            const deleteItemBtn = document.getElementById('deleteItemBtn');
-
-            if (!activeObj) {
-                controlsSection.style.display = 'none';
-                editItemBtn.style.display = 'none';
-                deleteItemBtn.style.display = 'none';
-                return;
-            }
-            controlsSection.style.display = 'block';
-            
-            const isCustomItem = !!appState.userItems[activeObj.itemKey];
-            editItemBtn.style.display = isCustomItem ? 'block' : 'none';
-            deleteItemBtn.style.display = isCustomItem ? 'block' : 'none';
-            
-            const item = getItemByKey(activeObj.itemKey);
-            document.getElementById('activeItemName').textContent = activeObj.name;
-            document.getElementById('itemLength').value = item.L;
-            document.getElementById('itemWidth').value = item.W;
-            document.getElementById('itemThickness').value = item.T;
-            document.getElementById('itemLength').readOnly = !isCustomItem;
-            document.getElementById('itemWidth').readOnly = !isCustomItem;
-            document.getElementById('itemThickness').readOnly = !isCustomItem;
-
-            document.getElementById('posXSlider').value = activeObj.position.x;
-            document.getElementById('posYSlider').value = activeObj.position.y;
-            document.getElementById('posZSlider').value = activeObj.position.z;
-            document.getElementById('posXValue').textContent = activeObj.position.x.toFixed(1);
-            document.getElementById('posYValue').textContent = activeObj.position.y.toFixed(1);
-            document.getElementById('posZValue').textContent = activeObj.position.z.toFixed(1);
-            document.getElementById('yawSlider').value = activeObj.rotation.yaw;
-            document.getElementById('pitchSlider').value = activeObj.rotation.pitch;
-            document.getElementById('rollSlider').value = activeObj.rotation.roll;
-            document.getElementById('yawInput').value = activeObj.rotation.yaw;
-            document.getElementById('pitchInput').value = activeObj.rotation.pitch;
-            document.getElementById('rollInput').value = activeObj.rotation.roll;
-        }
-        
-        function updateObjectSelector() {
-            const selector = document.getElementById('objectSelector');
-            selector.innerHTML = '';
-            if (appState.sceneObjects.length === 0) {
-                selector.innerHTML = '<option>No items in boot</option>';
-                selector.disabled = true;
-            } else {
-                appState.sceneObjects.forEach(obj => {
-                    const option = document.createElement('option');
-                    option.value = obj.id;
-                    option.textContent = obj.name;
-                    if (obj.id === appState.activeObjectId) option.selected = true;
-                    selector.appendChild(option);
-                });
-                selector.disabled = false;
-            }
-        }
-        
-        function populateCarSelector() {
-            const selector = document.getElementById('carSelector');
-            selector.innerHTML = '';
-            const presetGroup = document.createElement('optgroup');
-            presetGroup.label = 'Presets';
-            Object.keys(PRESET_CARS).forEach(key => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = PRESET_CARS[key].name;
-                presetGroup.appendChild(option);
-            });
-            selector.appendChild(presetGroup);
-
-            const customGroup = document.createElement('optgroup');
-            customGroup.label = 'My Cars';
-            Object.keys(appState.userCars).forEach(key => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = appState.userCars[key].name;
-                customGroup.appendChild(option);
-            });
-            if (Object.keys(appState.userCars).length > 0) {
-                selector.appendChild(customGroup);
-            }
-        }
-
-        function populateAddItemButtons() {
-            const container = document.getElementById('add-item-buttons');
-            container.innerHTML = '';
-            Object.keys(PRESET_ITEMS).forEach(key => {
-                const button = document.createElement('button');
-                button.className = 'btn primary';
-                button.textContent = `+ ${PRESET_ITEMS[key].name}`;
-                button.onclick = () => addItem(key);
-                container.appendChild(button);
-            });
-            Object.keys(appState.userItems).forEach(key => {
-                const button = document.createElement('button');
-                button.className = 'btn';
-                button.textContent = `+ ${appState.userItems[key].name}`;
-                button.onclick = () => addItem(key);
-                container.appendChild(button);
-            });
-        }
-        
-        function selectCar(carKey) {
-            appState.carKey = carKey;
-            const isCustom = !!appState.userCars[carKey];
-            document.getElementById('editCarBtn').style.display = isCustom ? 'block' : 'none';
-            document.getElementById('deleteCarBtn').style.display = isCustom ? 'block' : 'none';
-            document.getElementById('bootWidth').readOnly = !isCustom;
-            document.getElementById('bootDepth').readOnly = !isCustom;
-            updateBoot();
-        }
-
-        function centerActiveObject() {
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            if (!activeObj) return;
-            const car = getCarByKey(appState.carKey);
-            activeObj.position.x = car.W / 2;
-            activeObj.position.z = car.D / 2;
-            activeObj.rotation = { yaw: 0, pitch: 0, roll: 0 };
-            applyStateToObject(activeObj);
-        }
-
-        function toggleShelf() {
-            appState.shelfIn = document.getElementById('shelfToggle').checked;
-            updateBoot();
-        }
-        
-        // --- MODAL LOGIC ---
-        function showItemModal(id = null) {
-            const modal = document.getElementById('itemModal');
-            const title = document.getElementById('itemModalTitle');
-            const form = document.getElementById('itemForm');
-            form.reset();
-            document.getElementById('itemId').value = id || '';
-
-            if (id) {
-                title.textContent = 'Edit Custom Item';
-                const item = appState.userItems[id];
-                document.getElementById('itemName').value = item.name;
-                document.getElementById('modalItemL').value = item.L;
-                document.getElementById('modalItemW').value = item.W;
-                document.getElementById('modalItemT').value = item.T;
-            } else {
-                title.textContent = 'Add Custom Item';
-            }
-            modal.style.display = 'block';
-        }
-        function hideItemModal() { document.getElementById('itemModal').style.display = 'none'; }
-        
-        function showCarModal(id = null) {
-            const modal = document.getElementById('carModal');
-            const title = document.getElementById('carModalTitle');
-            const form = document.getElementById('carForm');
-            form.reset();
-            document.getElementById('carId').value = id || '';
-
-            if (id) {
-                title.textContent = 'Edit Custom Car';
-                const car = appState.userCars[id];
-                document.getElementById('carName').value = car.name;
-                document.getElementById('modalCarW').value = car.W;
-                document.getElementById('modalCarD').value = car.D;
-                const hasShelf = car.H_shelf_in !== car.H_shelf_out;
-                document.getElementById('modalCarHasShelf').checked = hasShelf;
-                document.getElementById('modalCarHShelfIn').value = car.H_shelf_in;
-                document.getElementById('modalCarHShelfOut').value = car.H_shelf_out;
-            } else {
-                title.textContent = 'Add Custom Car';
-            }
-            toggleShelfHeightInput();
-            modal.style.display = 'block';
-        }
-        function hideCarModal() { document.getElementById('carModal').style.display = 'none'; }
-        
-        function toggleShelfHeightInput() {
-            const hasShelf = document.getElementById('modalCarHasShelf').checked;
-            document.getElementById('shelfOutGroup').style.display = hasShelf ? 'block' : 'none';
-            document.getElementById('shelfInGroup').querySelector('label').textContent = hasShelf ? 'Height (Shelf In)' : 'Height';
-        }
-        
-        function handleItemForm(e) {
-            e.preventDefault();
-            const id = document.getElementById('itemId').value;
-            const key = id || `user_${Date.now()}`;
-            appState.userItems[key] = {
-                name: document.getElementById('itemName').value,
-                L: parseFloat(document.getElementById('modalItemL').value),
-                W: parseFloat(document.getElementById('modalItemW').value),
-                T: parseFloat(document.getElementById('modalItemT').value),
-            };
-            populateAddItemButtons();
-            recreateMeshes();
-            hideItemModal();
-        }
-
-        function handleCarForm(e) {
-            e.preventDefault();
-            const id = document.getElementById('carId').value;
-            const key = id || `user_${Date.now()}`;
-            const hasShelf = document.getElementById('modalCarHasShelf').checked;
-            const shelfInHeight = parseFloat(document.getElementById('modalCarHShelfIn').value);
-            appState.userCars[key] = {
-                name: document.getElementById('carName').value,
-                W: parseFloat(document.getElementById('modalCarW').value),
-                D: parseFloat(document.getElementById('modalCarD').value),
-                H_shelf_in: shelfInHeight,
-                H_shelf_out: hasShelf ? parseFloat(document.getElementById('modalCarHShelfOut').value) : shelfInHeight,
-            };
-            populateCarSelector();
-            document.getElementById('carSelector').value = key;
-            selectCar(key);
-            hideCarModal();
-        }
-        
-        function editActiveItemPreset() {
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            if (activeObj && appState.userItems[activeObj.itemKey]) {
-                showItemModal(activeObj.itemKey);
-            }
-        }
-        
-        function deleteActiveItemPreset() {
-            const activeObj = appState.sceneObjects.find(o => o.id === appState.activeObjectId);
-            if (activeObj && appState.userItems[activeObj.itemKey]) {
-                const keyToDelete = activeObj.itemKey;
-                delete appState.userItems[keyToDelete];
-                appState.sceneObjects = appState.sceneObjects.filter(o => o.itemKey !== keyToDelete);
-                recreateMeshes();
-                populateAddItemButtons();
-                setActiveObject(appState.sceneObjects.length > 0 ? appState.sceneObjects[0].id : null);
-            }
-        }
-        
-        function editActiveCar() {
-            if (appState.userCars[appState.carKey]) {
-                showCarModal(appState.carKey);
-            }
-        }
-        
-        function deleteActiveCar() {
-            const carKey = appState.carKey;
-            if (appState.userCars[carKey]) {
-                delete appState.userCars[carKey];
-                populateCarSelector();
-                selectCar('ENYAQ'); 
-                document.getElementById('carSelector').value = 'ENYAQ';
-            }
-        }
-
-        
-        // --- LOCAL STORAGE ---
-        function saveState() {
-            const stateToSave = {
-                ...appState,
-                sceneObjects: appState.sceneObjects.map(obj => ({
-                    id: obj.id, name: obj.name, itemKey: obj.itemKey, position: obj.position, rotation: obj.rotation,
-                }))
-            };
-            localStorage.setItem('bootFitCheckerState', JSON.stringify(stateToSave));
-        }
-        
-        function loadState() {
-            const savedStateJSON = localStorage.getItem('bootFitCheckerState');
-            if (savedStateJSON) {
-                const loaded = JSON.parse(savedStateJSON);
-                // Merge saved state with defaults to prevent errors if structure changes
-                appState = { ...appState, ...loaded };
-            }
-            
-            if (!getCarByKey(appState.carKey)) {
-                appState.carKey = 'ENYAQ'; // Default to a known preset car
-            }
-
-            // Ensure mesh property is not carried over from old saves
-            appState.sceneObjects.forEach(o => o.mesh = null);
-
-            updateBoot();
-            recreateMeshes();
-            updateObjectSelector();
-            updateUIFromState();
-        }
-        
-        function resetState() {
-            localStorage.removeItem('bootFitCheckerState');
-            location.reload();
-        }
-
-        window.addEventListener('DOMContentLoaded', init);
-    </script>
+    <!-- Main Application Script -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
