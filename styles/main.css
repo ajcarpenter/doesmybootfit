@@ -53,14 +53,15 @@ body {
     margin-bottom: 0.75rem;
 }
 
+/* Match selects to unified input styling */
 select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #374151;
-    background: #111827;
-    color: #f9fafb;
-    font-size: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 0.7rem;
+  border: 1px solid #374151;
+  background: #181c23;
+  color: #f9fafb;
+  font-size: 1rem;
 }
 
 select:focus {
@@ -72,6 +73,24 @@ select:focus {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
+}
+
+/* Ensure Fit Status text and badge align vertically */
+.fit-status h2 {
+  margin: 0;                 /* override section heading margin */
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.fit-status .badges {
+  display: flex;
+  align-items: center;
+}
+.fit-status .badge,
+.fit-status .info-dot {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .badges {
@@ -95,6 +114,12 @@ select:focus {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+}
+
+/* Make Typeahead occupy full row width inside button groups */
+.button-group .typeahead-container {
+  flex: 1 1 100%;
+  min-width: 100%;
 }
 
 .btn {
@@ -131,6 +156,41 @@ select:focus {
 
 .btn.primary:hover {
     background: #3b82f6;
+}
+
+/* Compact action buttons in Manage Objects list */
+.object-list .object-row .btn {
+  flex: 0 0 auto;            /* don't stretch */
+  padding: 0.25rem;          /* tighter padding */
+  width: 28px;               /* fixed compact width */
+  height: 28px;              /* fixed compact height */
+  line-height: 1;            /* center glyphs */
+  display: inline-flex;      /* center content */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Match the name input height to the action buttons */
+.object-list .object-row input[type="text"],
+.object-list .object-row input:not([type]) {
+  height: 28px;
+}
+
+/* Space between the Typeahead and the list of added objects */
+.object-list {
+  margin-top: 0.5rem;
+}
+
+/* Fixed-width tick so the row doesn't shift when active */
+.object-row .active-tick {
+  display: inline-flex;
+  width: 16px;
+  justify-content: center;
+  color: transparent;
+}
+.object-row .active-tick.on {
+  color: var(--accent, #2e7d32);
+  font-weight: 700;
 }
 
 .input-grid {
@@ -368,7 +428,7 @@ input:disabled + .slider {
 .typeahead-container {
   position: relative;
   width: 100%;
-  max-width: 220px;
+  max-width: 100%;
 }
 .typeahead-input {
   width: 100%;
@@ -401,6 +461,25 @@ input:disabled + .slider {
   color: #f9fafb;
 }
 .typeahead-dropdown .typeahead-option:hover, .typeahead-dropdown .typeahead-option.active {
+  background: #374151;
+}
+
+/* Inline info tooltip badge */
+.info-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2a2f38;
+  color: #cbd5e1;
+  font-weight: 700;
+  cursor: help;
+  border: 1px solid #374151;
+  font-size: 0.75rem;
+}
+.info-dot:hover {
   background: #374151;
 }
 
