@@ -1,69 +1,102 @@
-# React + TypeScript + Vite
+# Does My Boot Fit?
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight 3D fit checker to see if your ski boot (or any object) will fit in your car trunk. Built with React, TypeScript, and Three.js via @react-three/fiber.
 
-Currently, two official plugins are available:
+Live site: https://doesmyboot.fit
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- 3D scene of your car trunk and items you add
+- Accurate object-vs-bounds and object-vs-object checks using OBB + SAT with small tolerance
+- Drag, rotate, and snap controls
+  - Snap to floor (rotation-aware height projection)
+  - Snap rotations to 90°
+  - Clamped motion that respects car dimensions and object size
+- Sidebar UX
+  - Car selection with custom car modal and shelf-in/out toggle (when removable)
+  - Manage items: add presets, add custom, rename, delete, select
+  - Object controls: position and rotation with snapping
+  - Fit status badge with quick legend
+  - Share/backup: copy share link, export/import JSON, reset and clear
+  - Typeahead inputs with accessible combobox behavior
+- Performance
+  - rAF-batched recompute of collisions/fit
+  - Canvas frameloop “always” with AdaptiveDpr and device DPR bounds
+- Persistence & sharing
+  - LocalStorage autosave of full scene
+  - Hash-based share links that load and then clear the hash
+  - Import/export JSON of the entire scene
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech stack
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- React 19 + TypeScript 5 + Vite 7
+- three.js, @react-three/fiber, @react-three/drei
+- Plain CSS for styling
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Getting started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Prerequisites
+- Node.js 20.19+ or 22.12+
+
+Install and run
+- npm ci
+- npm run dev — start the dev server
+- npm run build — produce a production build in dist/
+- npm run preview — preview the production build
+
+## Deployment (GitHub Pages)
+
+This repo is wired to deploy via GitHub Actions to GitHub Pages.
+
+- Workflow: .github/workflows/deploy.yml
+- On push to main, CI builds the site, copies CNAME into dist, and deploys to Pages
+- Vite base is set to '/' (correct for the custom domain)
+- Ensure GitHub → Settings → Pages → Source is set to GitHub Actions
+
+Custom domain
+- The CNAME file at repo root contains: doesmyboot.fit
+- Ensure your DNS points to GitHub Pages per GitHub’s docs
+
+## Project structure
+
+```
+public/
+  favicon.svg
+  logo.png
+src/
+  components/        # 3D scene + sidebar UI
+  hooks/             # shared UI/transform math
+  utils/fitUtils.ts  # OBB/SAT fit and collision logic
+  Sidebar.tsx        # sidebar composition
+  App.tsx            # root state, persistence, fit coordination
+styles/
+  main.css           # UI styles
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Data model (simplified)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Types are in `src/types.ts`. A scene export/share payload roughly looks like:
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```json
+{
+  "carKey": "outback_2021",
+  "shelfIn": true,
+  "userCars": {},
+  "userItems": {},
+  "activeObjectId": 3,
+  "sceneObjects": [
+    {
+      "id": 3,
+      "itemKey": "boot_26_5",
+      "position": { "x": 50, "y": 14, "z": 75 },
+      "rotation": { "yaw": 90, "pitch": 0, "roll": 0 },
+      "snapToFloor": true
+    }
+  ]
+}
 ```
+
+Notes
+- Positions/rotations are in centimeters/degrees
+- Snap-to-floor auto-adjusts Y when enabled
+- On load, fit is recomputed and the share hash is cleared
