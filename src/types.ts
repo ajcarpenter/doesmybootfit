@@ -10,6 +10,7 @@ export type SceneObject = {
   rotation: Rotation;
   dims?: ItemDims;
   snapToFloor?: boolean;
+  snapRot?: boolean;
   isColliding?: boolean;
   fitStatus?: string;
 };

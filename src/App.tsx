@@ -16,6 +16,9 @@ const App: React.FC = () => {
   const [userItems, setUserItems] = React.useState<Record<string, { name: string; L: number; W: number; T: number }>>({});
   const [sceneObjects, setSceneObjects] = React.useState<any[]>([]);
   const [activeObjectId, setActiveObjectId] = React.useState<number | null>(null);
+  const [showGizmo, setShowGizmo] = React.useState<boolean>(false);
+  const [cameraPos, setCameraPos] = React.useState<{ x: number; y: number; z: number } | null>(null);
+  const [cameraTarget, setCameraTarget] = React.useState<{ x: number; y: number; z: number } | null>(null);
   // Prevent initial save from overwriting loaded state; once true, save effect activates
   const [hasLoaded, setHasLoaded] = React.useState(false);
 
@@ -41,6 +44,8 @@ const App: React.FC = () => {
             setSceneObjects(cloned);
           }
           if (shared.activeObjectId !== undefined) setActiveObjectId(shared.activeObjectId);
+          if (shared.camera && shared.camera.pos) setCameraPos(shared.camera.pos);
+          if (shared.camera && shared.camera.target) setCameraTarget(shared.camera.target);
           // Clear the share hash so subsequent refreshes use localStorage state
           try {
             const urlNoHash = `${window.location.pathname}${window.location.search}`;
@@ -63,7 +68,11 @@ const App: React.FC = () => {
           if (carCfg) checkAllCollisionsAndFit(cloned, carCfg, !!saved.shelfIn, getItem);
           setSceneObjects(cloned);
         }
-        if (saved.activeObjectId !== undefined) setActiveObjectId(saved.activeObjectId);
+  if (saved.activeObjectId !== undefined) setActiveObjectId(saved.activeObjectId);
+  if (saved.showGizmoEnabled !== undefined) setShowGizmo(!!saved.showGizmoEnabled);
+  else if (saved.showGizmoId !== undefined) setShowGizmo(!!saved.showGizmoId);
+  if (saved.camera && saved.camera.pos) setCameraPos(saved.camera.pos);
+  if (saved.camera && saved.camera.target) setCameraTarget(saved.camera.target);
       }
     } catch {}
     finally {
@@ -80,7 +89,9 @@ const App: React.FC = () => {
       shelfIn,
       userCars,
       userItems,
-      activeObjectId,
+  activeObjectId,
+  showGizmoEnabled: showGizmo,
+  camera: cameraPos || cameraTarget ? { pos: cameraPos, target: cameraTarget } : undefined,
       sceneObjects: sceneObjects.map(o => ({
         id: o.id,
         itemKey: o.itemKey,
@@ -89,10 +100,20 @@ const App: React.FC = () => {
         rotation: o.rotation,
   dims: o.dims,
   snapToFloor: !!o.snapToFloor,
+  snapRot: !!o.snapRot,
       })),
     };
     localStorage.setItem('bootFitCheckerState', JSON.stringify(stateToSave));
-  }, [hasLoaded, carKey, shelfIn, userCars, userItems, sceneObjects, activeObjectId]);
+  }, [hasLoaded, carKey, shelfIn, userCars, userItems, sceneObjects, activeObjectId, showGizmo, cameraPos, cameraTarget]);
+
+  // Listen for global toggle events from Canvas overlay
+  React.useEffect(() => {
+    function onToggle() {
+      setShowGizmo(v => !v);
+    }
+    window.addEventListener('toggle-rotation-gizmo', onToggle as any);
+    return () => window.removeEventListener('toggle-rotation-gizmo', onToggle as any);
+  }, []);
 
   const car = PRESET_CARS[carKey] || userCars[carKey];
 
@@ -164,6 +185,8 @@ const App: React.FC = () => {
             userCars,
             userItems,
             activeObjectId,
+            showGizmoEnabled: showGizmo,
+            camera: cameraPos || cameraTarget ? { pos: cameraPos, target: cameraTarget } : undefined,
             sceneObjects: sceneObjects.map(o => ({
               id: o.id,
               itemKey: o.itemKey,
@@ -172,6 +195,7 @@ const App: React.FC = () => {
               rotation: o.rotation,
               dims: o.dims,
               snapToFloor: !!o.snapToFloor,
+              snapRot: !!o.snapRot,
             })),
           };
           const json = JSON.stringify(stateToSave);
@@ -197,7 +221,11 @@ const App: React.FC = () => {
         activeObjectId={activeObjectId}
         setSceneObjects={setSceneObjectsWithFit}
         setActiveObjectId={setActiveObjectId}
-        userItems={userItems}
+  showGizmoEnabled={showGizmo}
+  cameraPosition={cameraPos || undefined}
+  cameraTarget={cameraTarget || undefined}
+  onCameraChange={(pos, target) => { setCameraPos(pos); setCameraTarget(target); }}
+  userItems={userItems}
       />
     </div>
   );

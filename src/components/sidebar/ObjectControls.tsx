@@ -12,7 +12,7 @@ interface Props {
 
 const ObjectControls: React.FC<Props> = ({ activeObj, activeDims, car, shelfIn, updateActive }) => {
   const { getProjectedHalfY, quantize } = useObjectControls();
-  const [snapRot, setSnapRot] = React.useState(false);
+  const [snapRot, setSnapRot] = React.useState(!!activeObj.snapRot);
 
   const selectedCarHeight = shelfIn ? car.H_shelf_in : car.H_shelf_out;
 
@@ -62,6 +62,7 @@ const ObjectControls: React.FC<Props> = ({ activeObj, activeDims, car, shelfIn, 
                   updateActive({ rotation: newRot });
                 }
               }
+              updateActive({ snapRot: next });
             }}
           />
           <span className="slider"></span>

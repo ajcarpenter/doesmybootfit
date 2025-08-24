@@ -11,12 +11,55 @@ const CanvasContainer: React.FC<{
   activeObjectId: number | null;
   setSceneObjects: (objs: any[]) => void;
   setActiveObjectId: (id: number | null) => void;
+  showGizmoEnabled?: boolean;
+  cameraPosition?: { x: number; y: number; z: number };
+  cameraTarget?: { x: number; y: number; z: number };
+  onCameraChange?: (pos: { x: number; y: number; z: number }, target: { x: number; y: number; z: number }) => void;
   userItems?: Record<string, { name: string; L: number; W: number; T: number }>;
-}> = ({ car, shelfIn, objects, activeObjectId, setSceneObjects, setActiveObjectId, userItems }) => {
+}> = ({ car, shelfIn, objects, activeObjectId, setSceneObjects, setActiveObjectId, showGizmoEnabled, cameraPosition, cameraTarget, onCameraChange, userItems }) => {
+  const [hover, setHover] = React.useState(false);
   return (
-    <main className="canvas-container">
+    <main className="canvas-container" style={{ position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, display: 'flex', gap: 8 }}>
+        <button
+          aria-pressed={!!showGizmoEnabled}
+          title={showGizmoEnabled ? 'Hide rotation gizmo' : 'Show rotation gizmo'}
+          onClick={() => {
+            const evt = new CustomEvent('toggle-rotation-gizmo');
+            window.dispatchEvent(evt);
+          }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          style={{
+            padding: '6px 10px',
+            borderRadius: 8,
+            border: '1px solid rgba(255,255,255,0.14)',
+            background: hover ? 'rgba(24,25,28,0.92)' : 'rgba(24,25,28,0.8)',
+            color: '#e6e6e6',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+            cursor: 'pointer'
+          }}
+        >{showGizmoEnabled ? '⟳ Rotation: On' : '⟳ Rotation: Off'}</button>
+    <button
+          title="Reset camera view"
+          onClick={() => {
+      const defaultPos = { x: 200, y: 200, z: 260 };
+      const defaultTarget = { x: car.W / 2, y: Math.min(40, (shelfIn ? car.H_shelf_in : car.H_shelf_out) * 0.25), z: car.D / 2 };
+            onCameraChange && onCameraChange(defaultPos, defaultTarget);
+          }}
+          style={{
+            padding: '6px 10px',
+            borderRadius: 8,
+            border: '1px solid rgba(255,255,255,0.14)',
+            background: 'rgba(24,25,28,0.8)',
+            color: '#e6e6e6',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+            cursor: 'pointer'
+          }}
+        >↺ Reset View</button>
+      </div>
       <Canvas
-        camera={{ position: [150, 150, 180], fov: 45, near: 0.1, far: 2000 }}
+        camera={{ position: [cameraPosition?.x ?? 200, cameraPosition?.y ?? 200, cameraPosition?.z ?? 260], fov: 45, near: 0.1, far: 2000 }}
         style={{ width: '100%', height: '100%' }}
         dpr={[1, 2]}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
@@ -30,6 +73,10 @@ const CanvasContainer: React.FC<{
           activeObjectId={activeObjectId}
           setSceneObjects={setSceneObjects}
           setActiveObjectId={setActiveObjectId}
+          showGizmoEnabled={!!showGizmoEnabled}
+          cameraPosition={cameraPosition}
+          cameraTarget={cameraTarget}
+          onCameraChange={onCameraChange}
           userItems={userItems}
         />
       </Canvas>

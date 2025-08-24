@@ -50,6 +50,29 @@ const ManageItems: React.FC<Props> = ({ carW, carD, userItems, sceneObjects, set
     if (activeObjectId === id) setActiveObjectId(null);
   }
 
+  function handleDuplicate(id: number) {
+    const source = sceneObjects.find(o => o.id === id);
+    if (!source) return;
+    const newId = Date.now();
+    // Name: append (copy) for clarity
+    const newName = `${source.name} (copy)`;
+    // Slight offset so it's visible; user can adjust if near bounds
+    const newPos = {
+      x: source.position.x + 3,
+      y: source.position.y,
+      z: source.position.z + 3,
+    };
+    const newObj: SceneObject = {
+      ...source,
+      id: newId,
+      name: newName,
+      position: newPos,
+      // fit flags will be recomputed by App's rAF pipeline
+    } as SceneObject;
+    setSceneObjects([...(sceneObjects as any), newObj] as any);
+    setActiveObjectId(newId);
+  }
+
   return (
     <section className="section">
       <h3>Manage Items</h3>
@@ -73,6 +96,7 @@ const ManageItems: React.FC<Props> = ({ carW, carD, userItems, sceneObjects, set
                 <span className={`active-tick${isActive ? ' on' : ''}`} title={isActive ? 'Selected' : ''} aria-hidden="true">✓</span>
                 <input value={obj.name} onChange={e => handleRename(obj.id, e.target.value)} style={{ flex: 1, minWidth: 0 }} />
                 <button className="btn" title={isActive ? 'Selected' : 'Select'} onClick={() => setActiveObjectId(obj.id)} disabled={isActive}>●</button>
+                <button className="btn" title="Duplicate" onClick={() => handleDuplicate(obj.id)}>⧉</button>
                 <button className="btn danger" title="Delete" onClick={() => handleDelete(obj.id)}>✕</button>
               </div>
             );
