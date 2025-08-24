@@ -34,25 +34,24 @@ class BootFitApp {
     init() {
         const canvas = document.getElementById('canvas');
         this.sceneManager.init(canvas);
-        
-        // Wait for the next frame to ensure scene is fully initialized
         requestAnimationFrame(() => {
-            // Update the ObjectManager with the initialized scene
             this.objectManager.updateScene(this.sceneManager.getScene());
-            
             this.loadState();
             this.populateCarSelector();
-            this.populateAddItemButtons();
-            
+            this.setupAddItemTypeahead();
             this.sceneManager.animate();
             this.setupDragHandlers();
             this.setupFormEventListeners();
-            
-
         });
     }
-    
 
+    setupAddItemTypeahead() {
+        this.uiManager.setupAddItemTypeahead(
+            PRESET_ITEMS,
+            this.appState.userItems,
+            this.addItem.bind(this)
+        );
+    }
 
     setupDragHandlers() {
         this.dragHandler.setup(
@@ -69,7 +68,13 @@ class BootFitApp {
 
     setupFormEventListeners() {
         document.getElementById('itemForm').addEventListener('submit', (e) => {
-            this.uiManager.handleItemForm(e, this.appState.userItems, this.populateAddItemButtons.bind(this), this.recreateMeshes.bind(this), this.hideItemModal.bind(this));
+            this.uiManager.handleItemForm(
+                e,
+                this.appState.userItems,
+                this.setupAddItemTypeahead.bind(this),
+                this.recreateMeshes.bind(this),
+                this.hideItemModal.bind(this)
+            );
         });
         
         document.getElementById('carForm').addEventListener('submit', (e) => {
@@ -192,11 +197,20 @@ class BootFitApp {
     }
 
     updateObjectSelector() {
-        this.uiManager.updateObjectSelector(this.appState.sceneObjects, this.appState.activeObjectId);
+        this.uiManager.updateObjectSelector(
+            this.appState.sceneObjects,
+            this.appState.activeObjectId,
+            this.setActiveObject.bind(this)
+        );
     }
 
     populateCarSelector() {
-        this.uiManager.populateCarSelector(PRESET_CARS, this.appState.userCars, this.selectCar.bind(this));
+        this.uiManager.setupTypeaheadCarSelector(
+            PRESET_CARS,
+            this.appState.userCars,
+            this.selectCar.bind(this),
+            this.appState.carKey
+        );
     }
 
     populateAddItemButtons() {
@@ -271,7 +285,7 @@ class BootFitApp {
             });
             this.appState.sceneObjects = this.appState.sceneObjects.filter(o => o.itemKey !== keyToDelete);
             this.recreateMeshes();
-            this.populateAddItemButtons();
+            this.setupAddItemTypeahead();
             this.setActiveObject(this.appState.sceneObjects.length > 0 ? this.appState.sceneObjects[0].id : null);
         }
     }

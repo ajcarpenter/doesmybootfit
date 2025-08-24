@@ -125,10 +125,193 @@ export class UIManager {
         document.getElementById('rollInput').value = activeObj.rotation.roll;
     }
 
-    updateObjectSelector(sceneObjects, activeObjectId) {
+    setupTypeaheadObjectSelector(sceneObjects, activeObjectId, setActiveObject) {
+        const input = document.getElementById('objectSelectorInput');
+        const dropdown = document.getElementById('objectSelectorDropdown');
+        let options = sceneObjects.map(obj => ({ id: obj.id, name: obj.name }));
+        let activeIndex = -1;
+        function renderDropdown(filtered) {
+            dropdown.innerHTML = '';
+            if (!filtered.length) {
+                dropdown.classList.remove('active');
+                return;
+            }
+            filtered.forEach((obj, idx) => {
+                const div = document.createElement('div');
+                div.className = 'typeahead-option' + (idx === activeIndex ? ' active' : '');
+                div.textContent = obj.name;
+                div.onclick = () => {
+                    input.value = obj.name;
+                    dropdown.classList.remove('active');
+                    setActiveObject(obj.id);
+                };
+                dropdown.appendChild(div);
+            });
+            dropdown.classList.add('active');
+        }
+        function filterOptions(val) {
+            return options.filter(o => o.name.toLowerCase().includes(val.toLowerCase()));
+        }
+        input.oninput = () => {
+            activeIndex = -1;
+            renderDropdown(filterOptions(input.value));
+        };
+        input.onfocus = () => {
+            renderDropdown(filterOptions(input.value));
+        };
+        input.onblur = () => {
+            setTimeout(() => dropdown.classList.remove('active'), 100);
+        };
+        input.onkeydown = (e) => {
+            let filtered = filterOptions(input.value);
+            if (!filtered.length) return;
+            if (e.key === 'ArrowDown') {
+                activeIndex = Math.min(activeIndex + 1, filtered.length - 1);
+                renderDropdown(filtered);
+                e.preventDefault();
+            } else if (e.key === 'ArrowUp') {
+                activeIndex = Math.max(activeIndex - 1, 0);
+                renderDropdown(filtered);
+                e.preventDefault();
+            } else if (e.key === 'Enter' && activeIndex >= 0) {
+                input.value = filtered[activeIndex].name;
+                dropdown.classList.remove('active');
+                setActiveObject(filtered[activeIndex].id);
+                e.preventDefault();
+            }
+        };
+        // Set initial value
+        const activeObj = sceneObjects.find(o => o.id === activeObjectId);
+        input.value = activeObj ? activeObj.name : '';
+    }
+
+    setupTypeaheadCarSelector(presetCars, userCars, selectCarCallback, activeCarKey) {
+        const input = document.getElementById('carSelectorInput');
+        const dropdown = document.getElementById('carSelectorDropdown');
+        let options = [
+            ...Object.keys(presetCars).map(key => ({ key, name: presetCars[key].name })),
+            ...Object.keys(userCars).map(key => ({ key, name: userCars[key].name }))
+        ];
+        let activeIndex = -1;
+        function renderDropdown(filtered) {
+            dropdown.innerHTML = '';
+            if (!filtered.length) {
+                dropdown.classList.remove('active');
+                return;
+            }
+            filtered.forEach((car, idx) => {
+                const div = document.createElement('div');
+                div.className = 'typeahead-option' + (idx === activeIndex ? ' active' : '');
+                div.textContent = car.name;
+                div.onclick = () => {
+                    input.value = car.name;
+                    dropdown.classList.remove('active');
+                    selectCarCallback(car.key);
+                };
+                dropdown.appendChild(div);
+            });
+            dropdown.classList.add('active');
+        }
+        function filterOptions(val) {
+            return options.filter(o => o.name.toLowerCase().includes(val.toLowerCase()));
+        }
+        input.oninput = () => {
+            activeIndex = -1;
+            renderDropdown(filterOptions(input.value));
+        };
+        input.onfocus = () => {
+            renderDropdown(filterOptions(input.value));
+        };
+        input.onblur = () => {
+            setTimeout(() => dropdown.classList.remove('active'), 100);
+        };
+        input.onkeydown = (e) => {
+            let filtered = filterOptions(input.value);
+            if (!filtered.length) return;
+            if (e.key === 'ArrowDown') {
+                activeIndex = Math.min(activeIndex + 1, filtered.length - 1);
+                renderDropdown(filtered);
+                e.preventDefault();
+            } else if (e.key === 'ArrowUp') {
+                activeIndex = Math.max(activeIndex - 1, 0);
+                renderDropdown(filtered);
+                e.preventDefault();
+            } else if (e.key === 'Enter' && activeIndex >= 0) {
+                input.value = filtered[activeIndex].name;
+                dropdown.classList.remove('active');
+                selectCarCallback(filtered[activeIndex].key);
+                e.preventDefault();
+            }
+        };
+        // Set initial value
+        const activeCar = options.find(o => o.key === activeCarKey);
+        input.value = activeCar ? activeCar.name : '';
+    }
+
+    setupAddItemTypeahead(presetItems, userItems, addItemCallback) {
+        const input = document.getElementById('addItemTypeaheadInput');
+        const dropdown = document.getElementById('addItemTypeaheadDropdown');
+        let options = [
+            ...Object.keys(presetItems).map(key => ({ key, name: presetItems[key].name })),
+            ...Object.keys(userItems).map(key => ({ key, name: userItems[key].name }))
+        ];
+        let activeIndex = -1;
+        function renderDropdown(filtered) {
+            dropdown.innerHTML = '';
+            if (!filtered.length) {
+                dropdown.classList.remove('active');
+                return;
+            }
+            filtered.forEach((obj, idx) => {
+                const div = document.createElement('div');
+                div.className = 'typeahead-option' + (idx === activeIndex ? ' active' : '');
+                div.textContent = obj.name;
+                div.onclick = () => {
+                    input.value = '';
+                    dropdown.classList.remove('active');
+                    addItemCallback(obj.key);
+                };
+                dropdown.appendChild(div);
+            });
+            dropdown.classList.add('active');
+        }
+        function filterOptions(val) {
+            return options.filter(o => o.name.toLowerCase().includes(val.toLowerCase()));
+        }
+        input.oninput = () => {
+            activeIndex = -1;
+            renderDropdown(filterOptions(input.value));
+        };
+        input.onfocus = () => {
+            renderDropdown(filterOptions(input.value));
+        };
+        input.onblur = () => {
+            setTimeout(() => dropdown.classList.remove('active'), 100);
+        };
+        input.onkeydown = (e) => {
+            let filtered = filterOptions(input.value);
+            if (!filtered.length) return;
+            if (e.key === 'ArrowDown') {
+                activeIndex = Math.min(activeIndex + 1, filtered.length - 1);
+                renderDropdown(filtered);
+                e.preventDefault();
+            } else if (e.key === 'ArrowUp') {
+                activeIndex = Math.max(activeIndex - 1, 0);
+                renderDropdown(filtered);
+                e.preventDefault();
+            } else if (e.key === 'Enter' && activeIndex >= 0) {
+                input.value = '';
+                dropdown.classList.remove('active');
+                addItemCallback(filtered[activeIndex].key);
+                e.preventDefault();
+            }
+        };
+        input.value = '';
+    }
+
+    updateObjectSelector(sceneObjects, activeObjectId, setActiveObject) {
         const selector = document.getElementById('objectSelector');
         selector.innerHTML = '';
-        
         if (sceneObjects.length === 0) {
             selector.innerHTML = '<option>No items in boot</option>';
             selector.disabled = true;
@@ -142,6 +325,10 @@ export class UIManager {
             });
             selector.disabled = false;
         }
+        selector.onchange = (e) => {
+            const id = e.target.value;
+            if (setActiveObject) setActiveObject(id);
+        };
     }
 
     populateCarSelector(presetCars, userCars, selectCarCallback) {

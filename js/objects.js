@@ -107,10 +107,6 @@ export class ObjectManager {
                 console.error('Error creating mesh for object:', obj, error);
             }
         });
-        // After all meshes are created and positioned, update collision and color state
-        if (typeof window.app === 'object' && typeof window.app.checkAllCollisionsAndFit === 'function') {
-            window.app.checkAllCollisionsAndFit();
-        }
     }
 
     applyStateToObject(obj, isDrag = false, car, getCarByKey) {
