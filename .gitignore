@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# Keep dist ignored; Pages is deployed via GitHub Actions artifact
 dist
 dist-ssr
 *.local
