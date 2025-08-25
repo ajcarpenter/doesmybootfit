@@ -16,7 +16,10 @@ const CanvasContainer: React.FC<{
   cameraTarget?: { x: number; y: number; z: number };
   onCameraChange?: (pos: { x: number; y: number; z: number }, target: { x: number; y: number; z: number }) => void;
   userItems?: Record<string, { name: string; L: number; W: number; T: number }>;
-}> = ({ car, shelfIn, objects, activeObjectId, setSceneObjects, setActiveObjectId, showGizmoEnabled, cameraPosition, cameraTarget, onCameraChange, userItems }) => {
+  meshEditMode?: boolean;
+  setMeshEditMode?: (v: boolean) => void;
+  onUpdateMeshSlab?: (index: number, patch: { y?: number; zStart?: number; depth?: number; backHalfW?: number; frontHalfW?: number }) => void;
+}> = ({ car, shelfIn, objects, activeObjectId, setSceneObjects, setActiveObjectId, showGizmoEnabled, cameraPosition, cameraTarget, onCameraChange, userItems, meshEditMode, setMeshEditMode, onUpdateMeshSlab }) => {
   const [hover, setHover] = React.useState(false);
   return (
     <main className="canvas-container" style={{ position: 'relative' }}>
@@ -40,6 +43,22 @@ const CanvasContainer: React.FC<{
             cursor: 'pointer'
           }}
         >{showGizmoEnabled ? '⟳ Rotation: On' : '⟳ Rotation: Off'}</button>
+        {car.bootShapeMode === 'mesh' && car.bootMesh && (
+          <button
+            aria-pressed={!!meshEditMode}
+            title={meshEditMode ? 'Exit mesh edit mode' : 'Enter mesh edit mode'}
+            onClick={() => setMeshEditMode && setMeshEditMode(!meshEditMode)}
+            style={{
+              padding: '6px 10px',
+              borderRadius: 8,
+              border: '1px solid rgba(255,255,255,0.14)',
+              background: 'rgba(24,25,28,0.8)',
+              color: meshEditMode ? '#d1fae5' : '#e6e6e6',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+              cursor: 'pointer'
+            }}
+          >{meshEditMode ? '✎ Mesh Edit: On' : '✎ Mesh Edit: Off'}</button>
+        )}
     <button
           title="Reset camera view"
           onClick={() => {
@@ -78,6 +97,8 @@ const CanvasContainer: React.FC<{
           cameraTarget={cameraTarget}
           onCameraChange={onCameraChange}
           userItems={userItems}
+          meshEditMode={!!meshEditMode}
+          onUpdateMeshSlab={onUpdateMeshSlab}
         />
       </Canvas>
     </main>

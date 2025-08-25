@@ -56,6 +56,7 @@ const CarSection: React.FC<Props> = ({ carKey, setCarKey, shelfIn, setShelfIn, u
 
   const selectedCar = PRESET_CARS[carKey] || userCars[carKey];
   const hasRemovableShelf = selectedCar?.H_shelf_in !== selectedCar?.H_shelf_out;
+  const isMesh = selectedCar?.bootShapeMode === 'mesh' && selectedCar?.bootMesh;
 
   return (
     <section className="section">
@@ -77,11 +78,13 @@ const CarSection: React.FC<Props> = ({ carKey, setCarKey, shelfIn, setShelfIn, u
       <div className="button-group button-group-margin">
         <button className="btn" onClick={handleAddCustomCar}>+ Add Custom Car</button>
       </div>
-      <div className="input-grid input-grid-margin">
-        <div className="input-group"><label>Width</label><input type="number" step="0.1" value={selectedCar?.W || ''} readOnly /></div>
-        <div className="input-group"><label>Depth</label><input type="number" step="0.1" value={selectedCar?.D || ''} readOnly /></div>
-        <div className="input-group"><label>Height</label><input type="number" step="0.1" value={shelfIn ? selectedCar?.H_shelf_in : selectedCar?.H_shelf_out || ''} readOnly /></div>
-      </div>
+      {!isMesh && (
+        <div className="input-grid input-grid-margin">
+          <div className="input-group"><label>Width</label><input type="number" step="0.1" value={selectedCar?.W || ''} readOnly /></div>
+          <div className="input-group"><label>Depth</label><input type="number" step="0.1" value={selectedCar?.D || ''} readOnly /></div>
+          <div className="input-group"><label>Height</label><input type="number" step="0.1" value={shelfIn ? selectedCar?.H_shelf_in : selectedCar?.H_shelf_out || ''} readOnly /></div>
+        </div>
+      )}
       <div className="toggle-group toggle-group-margin">
         <label htmlFor="shelfToggle">Parcel Shelf In</label>
         <label className="toggle-switch">

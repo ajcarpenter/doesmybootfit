@@ -5,6 +5,8 @@ export interface CarConfig {
   D: number;
   H_shelf_in: number;
   H_shelf_out: number;
+  bootShapeMode?: 'cube' | 'mesh';
+  bootMesh?: import('../types').MeshBootConfig; // optional custom mesh
 }
 
 export const PRESET_CARS: Record<string, CarConfig> = {

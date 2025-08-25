@@ -12,13 +12,14 @@ const App: React.FC = () => {
   // App-wide state
   const [carKey, setCarKey] = React.useState('ENYAQ');
   const [shelfIn, setShelfIn] = React.useState(true);
-  const [userCars, setUserCars] = React.useState<Record<string, { name: string; W: number; D: number; H_shelf_in: number; H_shelf_out: number }>>({});
+  const [userCars, setUserCars] = React.useState<Record<string, any>>({});
   const [userItems, setUserItems] = React.useState<Record<string, { name: string; L: number; W: number; T: number }>>({});
   const [sceneObjects, setSceneObjects] = React.useState<any[]>([]);
   const [activeObjectId, setActiveObjectId] = React.useState<number | null>(null);
   const [showGizmo, setShowGizmo] = React.useState<boolean>(false);
   const [cameraPos, setCameraPos] = React.useState<{ x: number; y: number; z: number } | null>(null);
   const [cameraTarget, setCameraTarget] = React.useState<{ x: number; y: number; z: number } | null>(null);
+  const [meshEditMode, setMeshEditMode] = React.useState<boolean>(false);
   // Prevent initial save from overwriting loaded state; once true, save effect activates
   const [hasLoaded, setHasLoaded] = React.useState(false);
 
@@ -116,6 +117,15 @@ const App: React.FC = () => {
   }, []);
 
   const car = PRESET_CARS[carKey] || userCars[carKey];
+  const isUserCar = !!userCars[carKey];
+  const handleUpdateMeshSlab = React.useCallback((index: number, patch: any) => {
+    if (!isUserCar) return; // only mutate user cars
+    const curr = userCars[carKey];
+    if (!curr || curr.bootShapeMode !== 'mesh' || !curr.bootMesh || !Array.isArray(curr.bootMesh.slabs)) return;
+    const slabs = curr.bootMesh.slabs.map((s: any, i: number) => i === index ? { ...s, ...patch } : s);
+    const nextCar = { ...curr, bootMesh: { slabs } };
+    setUserCars({ ...userCars, [carKey]: nextCar });
+  }, [userCars, carKey, isUserCar, setUserCars]);
 
   // Helper: get item by key
   const getItemByKey = React.useCallback((key: string) => (PRESET_ITEMS as any)[key] || (userItems as any)[key], [userItems]);
@@ -226,6 +236,9 @@ const App: React.FC = () => {
   cameraTarget={cameraTarget || undefined}
   onCameraChange={(pos, target) => { setCameraPos(pos); setCameraTarget(target); }}
   userItems={userItems}
+  meshEditMode={meshEditMode}
+  setMeshEditMode={setMeshEditMode}
+  onUpdateMeshSlab={handleUpdateMeshSlab}
       />
     </div>
   );

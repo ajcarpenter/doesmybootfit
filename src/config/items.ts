@@ -27,5 +27,6 @@ export const PRESET_ITEMS: Record<string, ItemConfig> = {
   CABIN_MAX_ANODE_55: { name: 'Cabin Max Anode 55×40×20', L: 55, W: 40, T: 20 },
   CLIFTON_CABIN: { name: 'Antler Clifton Cabin', L: 55, W: 40, T: 20 },
   RIMOWA_ESSENTIAL_CABIN: { name: 'Rimowa Essential Cabin', L: 55, W: 39, T: 23 },
-  AWAY_CARRY_ON: { name: 'Away Carry-On', L: 55.1, W: 34.8, T: 22.9 }
+  AWAY_CARRY_ON: { name: 'Away Carry-On', L: 55.1, W: 34.8, T: 22.9 },
+  BANANA_BOX: { name: 'Banana Box', L: 51, W: 39, T: 23 }
 };
