@@ -59,6 +59,22 @@ const CanvasContainer: React.FC<{
             }}
           >{meshEditMode ? '✎ Mesh Edit: On' : '✎ Mesh Edit: Off'}</button>
         )}
+        <button
+          title="Pack Banana Boxes"
+          onClick={() => {
+            const evt = new CustomEvent('banana-pack');
+            window.dispatchEvent(evt);
+          }}
+          style={{
+            padding: '6px 10px',
+            borderRadius: 8,
+            border: '1px solid rgba(255,255,255,0.14)',
+            background: 'rgba(24,25,28,0.8)',
+            color: '#e6e6e6',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+            cursor: 'pointer'
+          }}
+        >🍌 Banana Box Mode</button>
     <button
           title="Reset camera view"
           onClick={() => {

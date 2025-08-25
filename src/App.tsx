@@ -7,6 +7,7 @@ import Sidebar from './Sidebar';
 import { PRESET_CARS } from './config/cars';
 import { PRESET_ITEMS } from './config/items';
 import { checkAllCollisionsAndFit } from './utils/fitUtils';
+import { packBananaBoxes } from './utils/bananaPack';
 
 const App: React.FC = () => {
   // App-wide state
@@ -113,8 +114,22 @@ const App: React.FC = () => {
       setShowGizmo(v => !v);
     }
     window.addEventListener('toggle-rotation-gizmo', onToggle as any);
-    return () => window.removeEventListener('toggle-rotation-gizmo', onToggle as any);
-  }, []);
+    function onBananaPack() {
+      try {
+        const car = PRESET_CARS[carKey] || userCars[carKey];
+        const packed = packBananaBoxes(car, shelfIn, (k: string) => (PRESET_ITEMS as any)[k] || (userItems as any)[k]);
+        // Replace scene with packed banana boxes
+        checkAllCollisionsAndFit(packed as any, car, shelfIn, (k: string) => (PRESET_ITEMS as any)[k] || (userItems as any)[k]);
+        setSceneObjects(packed as any);
+        setActiveObjectId(packed.length ? packed[0].id : null);
+      } catch {}
+    }
+    window.addEventListener('banana-pack', onBananaPack as any);
+    return () => {
+      window.removeEventListener('toggle-rotation-gizmo', onToggle as any);
+      window.removeEventListener('banana-pack', onBananaPack as any);
+    };
+  }, [carKey, shelfIn, userCars, userItems]);
 
   const car = PRESET_CARS[carKey] || userCars[carKey];
   const isUserCar = !!userCars[carKey];
