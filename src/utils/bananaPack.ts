@@ -52,13 +52,20 @@ function packForOrient(
   const { sx, sy, sz, yaw, pitch, roll } = orient;
 
   // Determine vertical limit
-  const topY = (car as any).bootMesh ? (() => {
-    try {
-      const slabs = (car as any).bootMesh.slabs as Array<{ y: number }>;
-      if (!Array.isArray(slabs) || slabs.length === 0) return shelfIn ? car.H_shelf_in : car.H_shelf_out;
-      return slabs.map(s => s.y).sort((a, b) => a - b)[slabs.length - 1];
-    } catch { return shelfIn ? car.H_shelf_in : car.H_shelf_out; }
-  })() : (shelfIn ? car.H_shelf_in : car.H_shelf_out);
+  const topY = (car as any).bootMesh
+    ? (() => {
+        try {
+          const slabs = (car as any).bootMesh.slabs as Array<{ y: number }>;
+          if (!Array.isArray(slabs) || slabs.length === 0)
+            return shelfIn ? car.H_shelf_in : car.H_shelf_out;
+          return slabs.map((s) => s.y).sort((a, b) => a - b)[slabs.length - 1];
+        } catch {
+          return shelfIn ? car.H_shelf_in : car.H_shelf_out;
+        }
+      })()
+    : shelfIn
+      ? car.H_shelf_in
+      : car.H_shelf_out;
 
   const nx = Math.max(0, Math.floor(car.W / sx));
   const nz = Math.max(0, Math.floor(car.D / sz));
@@ -85,7 +92,7 @@ function packForOrient(
           snapRot: false,
         };
         // Validate using existing fit/collision logic
-        const tentative = [...placed, obj].map(o => ({ ...o }));
+        const tentative = [...placed, obj].map((o) => ({ ...o }));
         checkAllCollisionsAndFit(tentative as any, car, shelfIn, getItemByKey);
         const me = tentative[tentative.length - 1] as any;
         if (me.fitStatus === 'Fits') {
@@ -128,28 +135,33 @@ function packMixed(
 ): SceneObj[] {
   const orients = getOrientations(item);
   // Grid steps based on smallest extents across orientations
-  const stepX = Math.min(...orients.map(o => o.sx));
-  const stepY = Math.min(...orients.map(o => o.sy));
-  const stepZ = Math.min(...orients.map(o => o.sz));
+  const stepX = Math.min(...orients.map((o) => o.sx));
+  const stepY = Math.min(...orients.map((o) => o.sy));
+  const stepZ = Math.min(...orients.map((o) => o.sz));
 
   const nx = Math.max(0, Math.floor(car.W / stepX));
   const nz = Math.max(0, Math.floor(car.D / stepZ));
   // Determine vertical limit
-  const topY = (car as any).bootMesh ? (() => {
-    try {
-      const slabs = (car as any).bootMesh.slabs as Array<{ y: number }>;
-      if (!Array.isArray(slabs) || slabs.length === 0) return shelfIn ? car.H_shelf_in : car.H_shelf_out;
-      return slabs.map(s => s.y).sort((a, b) => a - b)[slabs.length - 1];
-    } catch { return shelfIn ? car.H_shelf_in : car.H_shelf_out; }
-  })() : (shelfIn ? car.H_shelf_in : car.H_shelf_out);
+  const topY = (car as any).bootMesh
+    ? (() => {
+        try {
+          const slabs = (car as any).bootMesh.slabs as Array<{ y: number }>;
+          if (!Array.isArray(slabs) || slabs.length === 0)
+            return shelfIn ? car.H_shelf_in : car.H_shelf_out;
+          return slabs.map((s) => s.y).sort((a, b) => a - b)[slabs.length - 1];
+        } catch {
+          return shelfIn ? car.H_shelf_in : car.H_shelf_out;
+        }
+      })()
+    : shelfIn
+      ? car.H_shelf_in
+      : car.H_shelf_out;
   const ny = Math.max(0, Math.floor(topY / stepY));
 
   if (nx === 0 || nz === 0 || ny === 0) return [];
 
   // Orientation preference: prioritize shorter height, then smaller footprint
-  const orientOrder = orients
-    .slice()
-    .sort((a, b) => (a.sy - b.sy) || (a.sx * a.sz - b.sx * b.sz));
+  const orientOrder = orients.slice().sort((a, b) => a.sy - b.sy || a.sx * a.sz - b.sx * b.sz);
 
   const xOffsets = [0, stepX / 2];
   const zOffsets = [0, stepZ / 2];
@@ -176,7 +188,7 @@ function packMixed(
                 snapToFloor: false,
                 snapRot: false,
               };
-              const tentative = [...placed, obj].map(o2 => ({ ...o2 }));
+              const tentative = [...placed, obj].map((o2) => ({ ...o2 }));
               checkAllCollisionsAndFit(tentative as any, car, shelfIn, getItemByKey);
               const me = tentative[tentative.length - 1] as any;
               if (me.fitStatus === 'Fits') {

@@ -16,11 +16,20 @@ interface TypeaheadProps {
   clearOnSelect?: boolean;
 }
 
-const Typeahead: React.FC<TypeaheadProps> = ({ options, placeholder, onSelect, value, setValue, dropdownId = 'typeahead-list', inputId = 'typeahead-input', clearOnSelect = true }) => {
+const Typeahead: React.FC<TypeaheadProps> = ({
+  options,
+  placeholder,
+  onSelect,
+  value,
+  setValue,
+  dropdownId = 'typeahead-list',
+  inputId = 'typeahead-input',
+  clearOnSelect = true,
+}) => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const filtered = options.filter(o => o.name.toLowerCase().includes(value.toLowerCase()));
+  const filtered = options.filter((o) => o.name.toLowerCase().includes(value.toLowerCase()));
 
   useEffect(() => {
     setActiveIndex(-1);
@@ -29,10 +38,10 @@ const Typeahead: React.FC<TypeaheadProps> = ({ options, placeholder, onSelect, v
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (!filtered.length) return;
     if (e.key === 'ArrowDown') {
-      setActiveIndex(i => Math.min(i + 1, filtered.length - 1));
+      setActiveIndex((i) => Math.min(i + 1, filtered.length - 1));
       e.preventDefault();
     } else if (e.key === 'ArrowUp') {
-      setActiveIndex(i => Math.max(i - 1, 0));
+      setActiveIndex((i) => Math.max(i - 1, 0));
       e.preventDefault();
     } else if (e.key === 'Enter' && activeIndex >= 0) {
       if (clearOnSelect) setValue('');
@@ -70,7 +79,7 @@ const Typeahead: React.FC<TypeaheadProps> = ({ options, placeholder, onSelect, v
         aria-autocomplete="list"
         aria-activedescendant={activeIndex >= 0 ? activeId : undefined}
         value={value}
-        onChange={e => setValue(e.target.value)}
+        onChange={(e) => setValue(e.target.value)}
         onFocus={() => setShowDropdown(true)}
         onBlur={() => setTimeout(() => setShowDropdown(false), 100)}
         onKeyDown={handleKeyDown}
@@ -82,18 +91,19 @@ const Typeahead: React.FC<TypeaheadProps> = ({ options, placeholder, onSelect, v
         style={{ width: '100%' }}
         role="listbox"
       >
-        {showDropdown && filtered.map((obj, idx) => (
-          <div
-            id={`${dropdownId}-opt-${idx}`}
-            key={obj.key}
-            className={`typeahead-option${idx === activeIndex ? ' active' : ''}`}
-            role="option"
-            aria-selected={idx === activeIndex}
-            onMouseDown={() => handleOptionClick(idx)}
-          >
-            {obj.name}
-          </div>
-        ))}
+        {showDropdown &&
+          filtered.map((obj, idx) => (
+            <div
+              id={`${dropdownId}-opt-${idx}`}
+              key={obj.key}
+              className={`typeahead-option${idx === activeIndex ? ' active' : ''}`}
+              role="option"
+              aria-selected={idx === activeIndex}
+              onMouseDown={() => handleOptionClick(idx)}
+            >
+              {obj.name}
+            </div>
+          ))}
       </div>
     </div>
   );

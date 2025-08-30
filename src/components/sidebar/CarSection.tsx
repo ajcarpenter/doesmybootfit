@@ -2,17 +2,15 @@ import React from 'react';
 import Typeahead from '../Typeahead';
 import { PRESET_CARS } from '../../config/cars';
 import CarModal from '../CarModal';
+import { useStore } from '../../store/store';
 
-interface Props {
-  carKey: string;
-  setCarKey: (key: string) => void;
-  shelfIn: boolean;
-  setShelfIn: (v: boolean) => void;
-  userCars: Record<string, any>;
-  setUserCars: (cars: Record<string, any>) => void;
-}
-
-const CarSection: React.FC<Props> = ({ carKey, setCarKey, shelfIn, setShelfIn, userCars, setUserCars }) => {
+const CarSection: React.FC = () => {
+  const carKey = useStore((s) => s.carKey);
+  const setCarKey = useStore((s) => s.setCarKey);
+  const shelfIn = useStore((s) => s.shelfIn);
+  const setShelfIn = useStore((s) => s.setShelfIn);
+  const userCars = useStore((s) => s.userCars);
+  const setUserCars = useStore((s) => s.setUserCars);
   const [carInput, setCarInput] = React.useState('');
   const [carModalOpen, setCarModalOpen] = React.useState(false);
   const [editCarKey, setEditCarKey] = React.useState<string | null>(null);
@@ -72,23 +70,57 @@ const CarSection: React.FC<Props> = ({ carKey, setCarKey, shelfIn, setShelfIn, u
           dropdownId="carSelectorDropdown"
           clearOnSelect={false}
         />
-        <button className="btn" onClick={() => handleEditCar(carKey)} style={{ display: userCars[carKey] ? 'inline-block' : 'none' }}>Edit</button>
-        <button className="btn danger" onClick={() => handleDeleteCar(carKey)} style={{ display: userCars[carKey] ? 'inline-block' : 'none' }}>Delete</button>
+        <button
+          className="btn"
+          onClick={() => handleEditCar(carKey)}
+          style={{ display: userCars[carKey] ? 'inline-block' : 'none' }}
+        >
+          Edit
+        </button>
+        <button
+          className="btn danger"
+          onClick={() => handleDeleteCar(carKey)}
+          style={{ display: userCars[carKey] ? 'inline-block' : 'none' }}
+        >
+          Delete
+        </button>
       </div>
       <div className="button-group button-group-margin">
-        <button className="btn" onClick={handleAddCustomCar}>+ Add Custom Car</button>
+        <button className="btn" onClick={handleAddCustomCar}>
+          + Add Custom Car
+        </button>
       </div>
       {!isMesh && (
         <div className="input-grid input-grid-margin">
-          <div className="input-group"><label>Width</label><input type="number" step="0.1" value={selectedCar?.W || ''} readOnly /></div>
-          <div className="input-group"><label>Depth</label><input type="number" step="0.1" value={selectedCar?.D || ''} readOnly /></div>
-          <div className="input-group"><label>Height</label><input type="number" step="0.1" value={shelfIn ? selectedCar?.H_shelf_in : selectedCar?.H_shelf_out || ''} readOnly /></div>
+          <div className="input-group">
+            <label>Width</label>
+            <input type="number" step="0.1" value={selectedCar?.W || ''} readOnly />
+          </div>
+          <div className="input-group">
+            <label>Depth</label>
+            <input type="number" step="0.1" value={selectedCar?.D || ''} readOnly />
+          </div>
+          <div className="input-group">
+            <label>Height</label>
+            <input
+              type="number"
+              step="0.1"
+              value={shelfIn ? selectedCar?.H_shelf_in : selectedCar?.H_shelf_out || ''}
+              readOnly
+            />
+          </div>
         </div>
       )}
       <div className="toggle-group toggle-group-margin">
         <label htmlFor="shelfToggle">Parcel Shelf In</label>
         <label className="toggle-switch">
-          <input type="checkbox" id="shelfToggle" checked={shelfIn} disabled={!hasRemovableShelf} onChange={e => setShelfIn(e.target.checked)} />
+          <input
+            type="checkbox"
+            id="shelfToggle"
+            checked={shelfIn}
+            disabled={!hasRemovableShelf}
+            onChange={(e) => setShelfIn(e.target.checked)}
+          />
           <span className="slider"></span>
         </label>
       </div>

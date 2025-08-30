@@ -63,7 +63,8 @@ function buildOBB(obj: SceneObject, item: ItemConfig): OBB {
     [-1, -1, -1],
   ] as const;
   const corners = signs.map(([sx, sy, sz]) =>
-    new Vector3().copy(c)
+    new Vector3()
+      .copy(c)
       .add(new Vector3().copy(ux).multiplyScalar(sx * e[0]))
       .add(new Vector3().copy(uy).multiplyScalar(sy * e[1]))
       .add(new Vector3().copy(uz).multiplyScalar(sz * e[2]))
@@ -109,10 +110,14 @@ function obbIntersects(a: OBB, b: OBB): boolean {
 }
 
 function obbCornersInsideAABB(obb: OBB, bounds: { min: Vector3; max: Vector3 }, tol = TOL) {
-  return obb.corners.every((p) =>
-    p.x >= bounds.min.x - tol && p.x <= bounds.max.x + tol &&
-    p.y >= bounds.min.y - tol && p.y <= bounds.max.y + tol &&
-    p.z >= bounds.min.z - tol && p.z <= bounds.max.z + tol
+  return obb.corners.every(
+    (p) =>
+      p.x >= bounds.min.x - tol &&
+      p.x <= bounds.max.x + tol &&
+      p.y >= bounds.min.y - tol &&
+      p.y <= bounds.max.y + tol &&
+      p.z >= bounds.min.z - tol &&
+      p.z <= bounds.max.z + tol
   );
 }
 
@@ -124,7 +129,11 @@ function anyCornerAbove(obb: OBB, y: number, tol = TOL) {
 
 type Section = { y: number; z0: number; z1: number; back: number; front: number };
 
-function buildSectionsForCarMesh(car: { W: number; D: number; H_shelf_in: number }, mesh: MeshBootConfig, shelfIn: boolean): Section[] {
+function buildSectionsForCarMesh(
+  car: { W: number; D: number; H_shelf_in: number },
+  mesh: MeshBootConfig,
+  shelfIn: boolean
+): Section[] {
   const halfW = car.W / 2;
   const maxY = shelfIn ? car.H_shelf_in : Infinity;
   const sections = mesh.slabs
@@ -140,7 +149,9 @@ function buildSectionsForCarMesh(car: { W: number; D: number; H_shelf_in: number
   return sections;
 }
 
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
 
 function interpolateSectionAtY(sections: Section[], y: number): Section | null {
   if (sections.length < 2) return null;
@@ -177,13 +188,21 @@ function pointInsideInterpolatedMesh(carW: number, p: Vector3, sec: Section, tol
   return xFromCenter <= halfW;
 }
 
-function obbCornersInsideMesh(obb: OBB, car: CarConfig, meshCfg: MeshBootConfig, shelfIn: boolean): { inside: boolean; aboveTop: boolean } {
+function obbCornersInsideMesh(
+  obb: OBB,
+  car: CarConfig,
+  meshCfg: MeshBootConfig,
+  shelfIn: boolean
+): { inside: boolean; aboveTop: boolean } {
   const sections = buildSectionsForCarMesh(car, meshCfg, shelfIn);
   if (sections.length < 2) return { inside: false, aboveTop: false };
   const topY = sections[sections.length - 1].y;
   let aboveTop = false;
   const insideAll = obb.corners.every((p) => {
-    if (p.y > topY + TOL) { aboveTop = true; return false; }
+    if (p.y > topY + TOL) {
+      aboveTop = true;
+      return false;
+    }
     // For y below first section, clamp to first to avoid null; for between/above, interpolate
     const clampedY = Math.max(sections[0].y, Math.min(topY, p.y));
     const sec = interpolateSectionAtY(sections, clampedY) || sections[0];
@@ -191,7 +210,6 @@ function obbCornersInsideMesh(obb: OBB, car: CarConfig, meshCfg: MeshBootConfig,
   });
   return { inside: insideAll, aboveTop };
 }
-
 
 export function checkAllCollisionsAndFit(
   sceneObjects: SceneObject[],
@@ -229,7 +247,7 @@ export function checkAllCollisionsAndFit(
       obj.fitStatus = reason;
     }
   } else {
-    const meshCfg = ((car as any).bootMesh as MeshBootConfig);
+    const meshCfg = (car as any).bootMesh as MeshBootConfig;
     for (const { obj, obb } of obbs) {
       const { inside, aboveTop } = obbCornersInsideMesh(obb, car, meshCfg, shelfIn);
       let reason = 'Fits';

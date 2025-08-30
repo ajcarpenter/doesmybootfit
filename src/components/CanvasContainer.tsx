@@ -2,35 +2,51 @@ import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AdaptiveDpr } from '@react-three/drei';
 import BootScene from './BootScene';
-import type { CarConfig } from '../config/cars';
+import { useStore } from '../store/store';
 
-const CanvasContainer: React.FC<{
-  car: CarConfig;
-  shelfIn: boolean;
-  objects: any[];
-  activeObjectId: number | null;
-  setSceneObjects: (objs: any[]) => void;
-  setActiveObjectId: (id: number | null) => void;
-  showGizmoEnabled?: boolean;
-  cameraPosition?: { x: number; y: number; z: number };
-  cameraTarget?: { x: number; y: number; z: number };
-  onCameraChange?: (pos: { x: number; y: number; z: number }, target: { x: number; y: number; z: number }) => void;
-  userItems?: Record<string, { name: string; L: number; W: number; T: number }>;
-  meshEditMode?: boolean;
-  setMeshEditMode?: (v: boolean) => void;
-  onUpdateMeshSlab?: (index: number, patch: { y?: number; zStart?: number; depth?: number; backHalfW?: number; frontHalfW?: number }) => void;
-}> = ({ car, shelfIn, objects, activeObjectId, setSceneObjects, setActiveObjectId, showGizmoEnabled, cameraPosition, cameraTarget, onCameraChange, userItems, meshEditMode, setMeshEditMode, onUpdateMeshSlab }) => {
+const CanvasContainer: React.FC = () => {
+  const car = useStore((s) => s.car);
+  const shelfIn = useStore((s) => s.shelfIn);
+  const objects = useStore((s) => s.sceneObjects);
+  const activeObjectId = useStore((s) => s.activeObjectId);
+  const setSceneObjects = useStore((s) => s.setSceneObjectsWithFit) as any;
+  const setActiveObjectId = useStore((s) => s.setActiveObjectId);
+  const showGizmoEnabled = useStore((s) => s.showGizmo);
+  const cameraPosition = useStore((s) => s.cameraPos || (undefined as any));
+  const cameraTarget = useStore((s) => s.cameraTarget || (undefined as any));
+  const onCameraChange = useStore((s) => s.setCamera);
+  const userItems = useStore((s) => s.userItems);
+  const meshEditMode = useStore((s) => s.meshEditMode);
+  const setMeshEditMode = useStore((s) => s.setMeshEditMode);
+  const onUpdateMeshSlab = useStore((s) => s.updateMeshSlab);
+  const bananaPack = useStore((s) => s.bananaPack);
+  const setShowGizmo = useStore((s) => s.setShowGizmo);
+  const showGizmo = useStore((s) => s.showGizmo);
   const [hover, setHover] = React.useState(false);
+
+  React.useEffect(() => {
+    function onToggle() {
+      setShowGizmo(!showGizmo);
+    }
+    function onBananaPack() {
+      bananaPack();
+    }
+    window.addEventListener('toggle-rotation-gizmo', onToggle as any);
+    window.addEventListener('banana-pack', onBananaPack as any);
+    return () => {
+      window.removeEventListener('toggle-rotation-gizmo', onToggle as any);
+      window.removeEventListener('banana-pack', onBananaPack as any);
+    };
+  }, [bananaPack, setShowGizmo, showGizmo]);
   return (
     <main className="canvas-container" style={{ position: 'relative' }}>
-      <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, display: 'flex', gap: 8 }}>
+      <div
+        style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, display: 'flex', gap: 8 }}
+      >
         <button
           aria-pressed={!!showGizmoEnabled}
           title={showGizmoEnabled ? 'Hide rotation gizmo' : 'Show rotation gizmo'}
-          onClick={() => {
-            const evt = new CustomEvent('toggle-rotation-gizmo');
-            window.dispatchEvent(evt);
-          }}
+          onClick={() => setShowGizmo(!showGizmoEnabled)}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           style={{
@@ -40,9 +56,11 @@ const CanvasContainer: React.FC<{
             background: hover ? 'rgba(24,25,28,0.92)' : 'rgba(24,25,28,0.8)',
             color: '#e6e6e6',
             boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
-        >{showGizmoEnabled ? '⟳ Rotation: On' : '⟳ Rotation: Off'}</button>
+        >
+          {showGizmoEnabled ? '⟳ Rotation: On' : '⟳ Rotation: Off'}
+        </button>
         {car.bootShapeMode === 'mesh' && car.bootMesh && (
           <button
             aria-pressed={!!meshEditMode}
@@ -55,16 +73,15 @@ const CanvasContainer: React.FC<{
               background: 'rgba(24,25,28,0.8)',
               color: meshEditMode ? '#d1fae5' : '#e6e6e6',
               boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
-          >{meshEditMode ? '✎ Mesh Edit: On' : '✎ Mesh Edit: Off'}</button>
+          >
+            {meshEditMode ? '✎ Mesh Edit: On' : '✎ Mesh Edit: Off'}
+          </button>
         )}
         <button
           title="Pack Banana Boxes"
-          onClick={() => {
-            const evt = new CustomEvent('banana-pack');
-            window.dispatchEvent(evt);
-          }}
+          onClick={() => bananaPack()}
           style={{
             padding: '6px 10px',
             borderRadius: 8,
@@ -72,14 +89,20 @@ const CanvasContainer: React.FC<{
             background: 'rgba(24,25,28,0.8)',
             color: '#e6e6e6',
             boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
-        >🍌 Banana Box Mode</button>
-    <button
+        >
+          🍌 Banana Box Mode
+        </button>
+        <button
           title="Reset camera view"
           onClick={() => {
-      const defaultPos = { x: 200, y: 200, z: 260 };
-      const defaultTarget = { x: car.W / 2, y: Math.min(40, (shelfIn ? car.H_shelf_in : car.H_shelf_out) * 0.25), z: car.D / 2 };
+            const defaultPos = { x: 200, y: 200, z: 260 };
+            const defaultTarget = {
+              x: car.W / 2,
+              y: Math.min(40, (shelfIn ? car.H_shelf_in : car.H_shelf_out) * 0.25),
+              z: car.D / 2,
+            };
             onCameraChange && onCameraChange(defaultPos, defaultTarget);
           }}
           style={{
@@ -89,12 +112,19 @@ const CanvasContainer: React.FC<{
             background: 'rgba(24,25,28,0.8)',
             color: '#e6e6e6',
             boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
-        >↺ Reset View</button>
+        >
+          ↺ Reset View
+        </button>
       </div>
       <Canvas
-        camera={{ position: [cameraPosition?.x ?? 200, cameraPosition?.y ?? 200, cameraPosition?.z ?? 260], fov: 45, near: 0.1, far: 2000 }}
+        camera={{
+          position: [cameraPosition?.x ?? 200, cameraPosition?.y ?? 200, cameraPosition?.z ?? 260],
+          fov: 45,
+          near: 0.1,
+          far: 2000,
+        }}
         style={{ width: '100%', height: '100%' }}
         dpr={[1, 2]}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
@@ -102,19 +132,19 @@ const CanvasContainer: React.FC<{
       >
         <AdaptiveDpr pixelated />
         <BootScene
-          car={car}
+          car={car as any}
           shelfIn={shelfIn}
           objects={objects}
           activeObjectId={activeObjectId}
           setSceneObjects={setSceneObjects}
           setActiveObjectId={setActiveObjectId}
           showGizmoEnabled={!!showGizmoEnabled}
-          cameraPosition={cameraPosition}
-          cameraTarget={cameraTarget}
-          onCameraChange={onCameraChange}
+          cameraPosition={cameraPosition as any}
+          cameraTarget={cameraTarget as any}
+          onCameraChange={onCameraChange as any}
           userItems={userItems}
           meshEditMode={!!meshEditMode}
-          onUpdateMeshSlab={onUpdateMeshSlab}
+          onUpdateMeshSlab={onUpdateMeshSlab as any}
         />
       </Canvas>
     </main>

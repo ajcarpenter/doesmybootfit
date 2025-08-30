@@ -8,9 +8,18 @@ interface Props {
 const FitStatus: React.FC<Props> = ({ activeObjectId, sceneObjects }) => {
   const status = React.useMemo(() => {
     if (activeObjectId == null) return undefined;
-    return sceneObjects.find(o => o.id === activeObjectId)?.fitStatus;
+    return sceneObjects.find((o) => o.id === activeObjectId)?.fitStatus;
   }, [activeObjectId, sceneObjects]);
-  const cls = status === 'Fits' ? 'green' : status === 'Too Tall' ? 'yellow' : status === 'Exceeds Bounds' ? 'orange' : status === 'Colliding' ? 'red' : '';
+  const cls =
+    status === 'Fits'
+      ? 'green'
+      : status === 'Too Tall'
+        ? 'yellow'
+        : status === 'Exceeds Bounds'
+          ? 'orange'
+          : status === 'Colliding'
+            ? 'red'
+            : '';
 
   return (
     <div className="fit-status">

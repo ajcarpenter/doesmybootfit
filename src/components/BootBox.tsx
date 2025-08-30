@@ -3,7 +3,10 @@ import type { CarConfig } from '../config/cars';
 import React from 'react';
 
 const BootWireframe: React.FC<{ car: CarConfig; height: number }> = ({ car, height }) => {
-  const geometry = React.useMemo(() => new THREE.BoxGeometry(car.W, height, car.D), [car.W, height, car.D]);
+  const geometry = React.useMemo(
+    () => new THREE.BoxGeometry(car.W, height, car.D),
+    [car.W, height, car.D]
+  );
   const edges = React.useMemo(() => new THREE.EdgesGeometry(geometry), [geometry]);
   return (
     <lineSegments position={[car.W / 2, height / 2, car.D / 2]} geometry={edges}>
@@ -27,7 +30,8 @@ export const BootLabels: React.FC<{ car: CarConfig }> = ({ car }) => {
     // Rounded rect background
     ctx.fillStyle = 'rgba(30,34,44,0.95)';
     const r = 10;
-    const w = canvas.width, h = canvas.height;
+    const w = canvas.width,
+      h = canvas.height;
     ctx.beginPath();
     ctx.moveTo(r, 0);
     ctx.lineTo(w - r, 0);
@@ -92,8 +96,8 @@ interface BootBoxProps {
 const BootBox: React.FC<BootBoxProps> = ({ car, shelfIn }) => {
   return (
     <>
-  <BootWireframe car={car} height={shelfIn ? car.H_shelf_in : car.H_shelf_out} />
-  <BootLabels car={car} />
+      <BootWireframe car={car} height={shelfIn ? car.H_shelf_in : car.H_shelf_out} />
+      <BootLabels car={car} />
     </>
   );
 };

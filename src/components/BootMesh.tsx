@@ -6,19 +6,19 @@ function buildGeometry(cfg: MeshBootConfig, car: { W: number; D: number }, shelf
   // Interpret cfg.slabs as planar cross-sections at given y, then loft between consecutive planes
   const halfW = car.W / 2;
   const sections = cfg.slabs
-    .map(s => ({
+    .map((s) => ({
       y: s.y,
       z0: Math.max(0, Math.min(s.zStart, car.D)),
       z1: Math.max(0, Math.min(s.zStart + s.depth, car.D)),
       back: Math.min(halfW, Math.max(0, s.backHalfW)),
       front: Math.min(halfW, Math.max(0, s.frontHalfW)),
     }))
-    .filter(sec => sec.z1 > sec.z0)
+    .filter((sec) => sec.z1 > sec.z0)
     .sort((a, b) => a.y - b.y);
 
   // Apply shelf clipping: drop sections above shelfY
   const maxY = shelfY ?? Infinity;
-  const clipped = sections.filter(s => s.y <= maxY);
+  const clipped = sections.filter((s) => s.y <= maxY);
   if (clipped.length === 0) return new THREE.BufferGeometry();
 
   const positions: number[] = [];
@@ -76,11 +76,21 @@ const BootMesh: React.FC<{
   shelfY: number;
   config: MeshBootConfig;
 }> = ({ car, shelfIn, shelfY, config }) => {
-  const geom = React.useMemo(() => buildGeometry(config, car, shelfIn ? shelfY : undefined), [config, car, shelfIn, shelfY]);
+  const geom = React.useMemo(
+    () => buildGeometry(config, car, shelfIn ? shelfY : undefined),
+    [config, car, shelfIn, shelfY]
+  );
   return (
     <mesh position={[car.W / 2, 0, 0]} raycast={() => null} renderOrder={1} geometry={geom}>
       {/* position centers X at W/2 so mesh is symmetric about the boot's centerline */}
-  <meshBasicMaterial color="#5dade2" transparent opacity={0.22} depthTest={true} depthWrite={true} side={THREE.DoubleSide} />
+      <meshBasicMaterial
+        color="#5dade2"
+        transparent
+        opacity={0.22}
+        depthTest={true}
+        depthWrite={true}
+        side={THREE.DoubleSide}
+      />
     </mesh>
   );
 };
