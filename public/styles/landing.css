@@ -1,0 +1,46 @@
+/* Minimal, modern landing styles */
+:root{--bg:#0b1220;--ink:#e6edf6;--muted:#9fb0c6;--brand:#38bdf8;--brand-ink:#04131b;--card:#101a2c;--line:#1f2a44}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:linear-gradient(180deg,#0b1220,#0e1526);color:var(--ink);font:16px/1.6 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji}
+.container{max-width:1120px;margin:0 auto;padding:0 20px}
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.site-header{position:sticky;top:0;background:rgba(11,18,32,.7);backdrop-filter:saturate(150%) blur(10px);border-bottom:1px solid var(--line);z-index:20}
+.site-header .container{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.brand{display:flex;gap:10px;align-items:center;color:var(--ink);text-decoration:none;font-weight:700}
+.brand img{height:36px;width:auto;aspect-ratio:auto;border-radius:8px}
+.site-header nav{display:flex;gap:16px;align-items:center}
+.site-header nav a{color:var(--muted);text-decoration:none}
+.site-header nav a:hover{color:var(--ink)}
+.btn{display:inline-block;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600;border:1px solid transparent;transition:transform .08s ease,background-color .2s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--brand);color:var(--brand-ink)}
+.btn-ghost{color:var(--ink);border-color:var(--line)}
+.btn-small{padding:8px 12px}
+.hero{padding:72px 0 40px;background:radial-gradient(1000px 400px at 20% 0%,rgba(56,189,248,.2),transparent)}
+.grid-2{display:grid;grid-template-columns:1.15fr 1fr;gap:32px}
+@media (max-width: 900px){.grid-2{grid-template-columns:1fr;}}
+.hero-copy h1{font-size:48px;line-height:1.1;margin:0 0 14px}
+.lead{font-size:18px;color:var(--muted);margin:0 0 20px}
+.cta-row{display:flex;gap:12px;align-items:center;margin:14px 0 6px}
+.trust{color:var(--muted);font-size:14px}
+.media-frame{border:1px solid var(--line);background:linear-gradient(180deg,#0f192d,#0b1220);border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.media-frame img{display:block;width:100%;height:auto;border-radius:12px}
+.media-frame.small{max-width:380px}
+.features{padding:40px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.features h2,.how h2,.faq h2{font-size:28px;margin:0 0 20px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width: 900px){.cards{grid-template-columns:1fr 1fr}}
+@media (max-width: 580px){.cards{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{margin:0 0 8px;font-size:18px}
+.card p{margin:0;color:var(--muted)}
+.how{padding:40px 0}
+.how .container{display:block}
+.steps{margin:0 0 16px;padding-left:18px}
+.how-media{display:none}
+.faq{padding:40px 0}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
+.faq summary{cursor:pointer;font-weight:600}
+.site-footer{border-top:1px solid var(--line);padding:20px 0;color:var(--muted)}
+.site-footer .container{display:flex;justify-content:space-between;align-items:center}

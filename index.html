@@ -2,30 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Does My Boot Fit ...</title>
-  <meta name="description" content="Check if buggies, strollers/pushchairs, luggage, suitcases, prams, and boxes will fit in your car boot (trunk). Interactive 3D fit checker with real car dimensions." />
-  <meta name="keywords" content="car boot size, trunk size, fit checker, luggage fit, buggy fit, stroller fit, pushchair fit, pram fit, suitcase fit, box fit, car dimensions" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Does My Boot Fit? Check if it fits before you buy.</title>
+    <meta
+      name="description"
+      content="Will your buggy, stroller, luggage or boxes fit in your car boot (trunk)? Use our interactive 3D checker with real car dimensions. Try it free."
+    />
+    <meta
+      name="keywords"
+      content="car boot size, trunk size, fit checker, luggage fit, buggy fit, stroller fit, pushchair fit, pram fit, suitcase fit, box fit, car dimensions"
+    />
     <meta name="theme-color" content="#0f172a" />
     <link rel="canonical" href="https://doesmyboot.fit/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/logo.png" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://doesmyboot.fit/" />
     <meta property="og:title" content="Does My Boot Fit?" />
-  <meta property="og:description" content="Will your buggy, luggage, or boxes fit in your car boot (trunk)? Try the interactive 3D fit checker, share setups, and use presets." />
-  <meta property="og:image" content="https://doesmyboot.fit/logo_big.png" />
-  <meta property="og:image:alt" content="Does My Boot Fit logo" />
+    <meta
+      property="og:description"
+      content="See if buggies, luggage, and boxes fit in your car boot using an interactive 3D checker."
+    />
+    <meta property="og:image" content="https://doesmyboot.fit/logo_big.png" />
+    <meta property="og:image:alt" content="Does My Boot Fit logo" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Does My Boot Fit?" />
-  <meta name="twitter:description" content="Will your buggy, luggage, or boxes fit in your car boot (trunk)? Try the interactive 3D fit checker, share setups, and use presets." />
-  <meta name="twitter:image" content="https://doesmyboot.fit/logo_big.png" />
-  <meta name="twitter:image:alt" content="Does My Boot Fit logo" />
+    <meta
+      name="twitter:description"
+      content="See if buggies, luggage, and boxes fit in your car boot using an interactive 3D checker."
+    />
+    <meta name="twitter:image" content="https://doesmyboot.fit/logo_big.png" />
+    <meta name="twitter:image:alt" content="Does My Boot Fit logo" />
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -34,7 +45,7 @@
         "@type": "WebSite",
         "url": "https://doesmyboot.fit/",
         "name": "Does My Boot Fit",
-  "description": "Interactive 3D fit checker to see if your buggies, strollers, luggage, and boxes fit in your car boot/trunk.",
+        "description": "Interactive 3D fit checker to see if your buggies, strollers, luggage, and boxes fit in your car boot/trunk.",
         "inLanguage": "en"
       }
     </script>
@@ -42,15 +53,137 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W89QXMKP7H"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);} 
+      function gtag() {
+        dataLayer.push(arguments);
+      }
       gtag('js', new Date());
-
       gtag('config', 'G-W89QXMKP7H');
     </script>
-  
+
+    <link rel="preload" as="image" href="/logo_big.png" />
+    <link rel="stylesheet" href="/styles/landing.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <header class="site-header">
+      <div class="container">
+        <a class="brand" href="/">
+          <img src="/logo.png" alt="Does My Boot Fit logo" />
+          <span class="visually-hidden">Does My Boot Fit</span>
+        </a>
+        <nav>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#faq">FAQ</a>
+          <a class="btn btn-small" href="/app/">Launch tool</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container grid-2">
+          <div class="hero-copy">
+            <h1>Know it fits before you buy</h1>
+            <p class="lead">
+              An interactive 3D checker that tells you if your buggy, luggage or boxes will fit in
+              your car boot—using real dimensions and smart collision detection.
+            </p>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="/app/" id="launch-app">Try the tool</a>
+              <a class="btn btn-ghost" href="#features">See features</a>
+            </div>
+          </div>
+          <div class="hero-media">
+            <div class="media-frame">
+              <img src="/logo_big.png" alt="App preview" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="features">
+        <div class="container">
+          <h2>Why people love it</h2>
+          <div class="cards">
+            <article class="card">
+              <h3>Real car dimensions</h3>
+              <p>Pick your car or add your own. We use width, depth and shelf height for accuracy.</p>
+            </article>
+            <article class="card">
+              <h3>Smart 3D fit</h3>
+              <p>Drag, rotate and stack items. We show collisions and whether it fits at a glance.</p>
+            </article>
+            <article class="card">
+              <h3>Presets and sharing</h3>
+              <p>Use common items or create your own. Share a link that reproduces your setup.</p>
+            </article>
+            <article class="card">
+              <h3>Fast packing</h3>
+              <p>Auto-pack “banana boxes” to find an efficient layout for common loads.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" class="how">
+        <div class="container">
+          <div>
+            <h2>How it works</h2>
+            <ol class="steps">
+              <li>Select your car or enter yours.</li>
+              <li>Add items like buggies, suitcases or custom boxes.</li>
+              <li>Drag and rotate to test fits, then share your link.</li>
+            </ol>
+            <a class="btn btn-primary" href="/app/">Launch the tool</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="faq">
+        <div class="container">
+          <h2>FAQ</h2>
+          <details>
+            <summary>Is it free?</summary>
+            <p>Yes, the core tool is free to try. Advanced features may be added later.</p>
+          </details>
+          <details>
+            <summary>How accurate is it?</summary>
+            <p>
+              Measurements are based on your selected car and item sizes. Use manufacturer specs for
+              best results.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Does My Boot Fit</p>
+        <a href="/app/">Launch tool</a>
+      </div>
+    </footer>
+
+    <script>
+      // Redirect shared state links to /app/ and attach GA events
+      (function () {
+        const h = window.location.hash || '';
+        if (h.startsWith('#s=')) {
+          const target = '/app/' + h;
+          window.location.replace(target);
+          return; // stop further handlers on redirect
+        }
+        var y = document.getElementById('year');
+        if (y) y.textContent = String(new Date().getFullYear());
+
+        // Track CTA clicks
+        var cta = document.getElementById('launch-app');
+        if (cta && typeof gtag === 'function') {
+          cta.addEventListener('click', function () {
+            try { gtag('event', 'launch_tool_cta', { location: 'hero' }); } catch (e) {}
+          });
+        }
+      })();
+    </script>
   </body>
-</html>
+  </html>
