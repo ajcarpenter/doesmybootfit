@@ -44,3 +44,13 @@ body{margin:0;background:linear-gradient(180deg,#0b1220,#0e1526);color:var(--ink
 .faq summary{cursor:pointer;font-weight:600}
 .site-footer{border-top:1px solid var(--line);padding:20px 0;color:var(--muted)}
 .site-footer .container{display:flex;justify-content:space-between;align-items:center}
+
+/* Mobile header adjustments */
+@media (max-width: 640px){
+  .site-header .container{padding:10px 14px}
+  .brand img{height:32px}
+  .site-header nav{gap:8px}
+  /* Hide non-CTA links on small screens */
+  .site-header nav a:not(.btn){display:none}
+  .site-header nav .btn{padding:8px 10px;font-size:14px}
+}
