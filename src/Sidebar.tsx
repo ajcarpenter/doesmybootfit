@@ -2,7 +2,6 @@ import React from 'react';
 import { PRESET_CARS } from './config/cars';
 import { PRESET_ITEMS } from './config/items';
 import ItemModal from './components/ItemModal';
-import AdUnit from './components/sidebar/AdUnit';
 import ObjectControls from './components/sidebar/ObjectControls';
 import ManageItems from './components/sidebar/ManageItems';
 import ShareBackup from './components/sidebar/ShareBackup';
@@ -128,7 +127,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             updateActive={(patch) => updateActive(patch)}
           />
         )}
-  <AdUnit />
+  {/* Ads temporarily disabled until AdSense approval */}
         <ShareBackup
           exportJson={() => {
             try {
